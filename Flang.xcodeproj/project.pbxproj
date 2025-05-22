@@ -6,17 +6,29 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		ED0ED4252DDDD4DF002D8EE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */; };
+		ED0ED4272DDDD4DF002D8EE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */; };
+		ED0ED4322DDDED8A002D8EE2 /* Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0ED4312DDDED83002D8EE2 /* Source.swift */; };
+		ED0ED4352DDDF4D3002D8EE2 /* Sources.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0ED4342DDDF4D1002D8EE2 /* Sources.swift */; };
+		ED0ED4372DDDF81E002D8EE2 /* sources.json in Resources */ = {isa = PBXBuildFile; fileRef = ED0ED4362DDDF81E002D8EE2 /* sources.json */; };
+		ED9E44FD2DDE18B500543DD4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9E44FC2DDE18B300543DD4 /* main.swift */; };
+		ED9E44FF2DDE1EB000543DD4 /* flags.zip in Resources */ = {isa = PBXBuildFile; fileRef = ED9E44FE2DDE1EB000543DD4 /* flags.zip */; };
+		EDDFB56E2DDE82A20096533A /* InputSourcesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDDFB56D2DDE82A00096533A /* InputSourcesManager.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		ED0ED3FC2DDDCA63002D8EE2 /* Flang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flang.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ED0ED4212DDDD4DF002D8EE2 /* Flang.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Flang.entitlements; sourceTree = "<group>"; };
+		ED0ED4312DDDED83002D8EE2 /* Source.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Source.swift; sourceTree = "<group>"; };
+		ED0ED4342DDDF4D1002D8EE2 /* Sources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources.swift; sourceTree = "<group>"; };
+		ED0ED4362DDDF81E002D8EE2 /* sources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = sources.json; sourceTree = "<group>"; };
+		ED9E44FC2DDE18B300543DD4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		ED9E44FE2DDE1EB000543DD4 /* flags.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = flags.zip; sourceTree = "<group>"; };
+		EDDFB56D2DDE82A00096533A /* InputSourcesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourcesManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		ED0ED3FE2DDDCA63002D8EE2 /* Flang */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Flang;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		ED0ED3F92DDDCA63002D8EE2 /* Frameworks */ = {
@@ -32,7 +44,7 @@
 		ED0ED3F32DDDCA63002D8EE2 = {
 			isa = PBXGroup;
 			children = (
-				ED0ED3FE2DDDCA63002D8EE2 /* Flang */,
+				ED0ED4232DDDD4DF002D8EE2 /* Flang */,
 				ED0ED3FD2DDDCA63002D8EE2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +55,54 @@
 				ED0ED3FC2DDDCA63002D8EE2 /* Flang.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		ED0ED4232DDDD4DF002D8EE2 /* Flang */ = {
+			isa = PBXGroup;
+			children = (
+				ED9E44FC2DDE18B300543DD4 /* main.swift */,
+				ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */,
+				ED0ED42D2DDDE8F8002D8EE2 /* Sources */,
+				ED0ED4282DDDD5F0002D8EE2 /* Application Layer */,
+			);
+			path = Flang;
+			sourceTree = "<group>";
+		};
+		ED0ED4282DDDD5F0002D8EE2 /* Application Layer */ = {
+			isa = PBXGroup;
+			children = (
+				ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */,
+				ED0ED4212DDDD4DF002D8EE2 /* Flang.entitlements */,
+				ED9E44FE2DDE1EB000543DD4 /* flags.zip */,
+			);
+			path = "Application Layer";
+			sourceTree = "<group>";
+		};
+		ED0ED42D2DDDE8F8002D8EE2 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EDDFB56D2DDE82A00096533A /* InputSourcesManager.swift */,
+				ED0ED4342DDDF4D1002D8EE2 /* Sources.swift */,
+				ED0ED42E2DDDE900002D8EE2 /* Data */,
+				ED0ED4332DDDEDB4002D8EE2 /* Models */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		ED0ED42E2DDDE900002D8EE2 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				ED0ED4362DDDF81E002D8EE2 /* sources.json */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		ED0ED4332DDDEDB4002D8EE2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				ED0ED4312DDDED83002D8EE2 /* Source.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +119,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				ED0ED3FE2DDDCA63002D8EE2 /* Flang */,
 			);
 			name = Flang;
 			packageProductDependencies = (
@@ -109,6 +166,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED9E44FF2DDE1EB000543DD4 /* flags.zip in Resources */,
+				ED0ED4372DDDF81E002D8EE2 /* sources.json in Resources */,
+				ED0ED4272DDDD4DF002D8EE2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +179,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED0ED4252DDDD4DF002D8EE2 /* AppDelegate.swift in Sources */,
+				EDDFB56E2DDE82A20096533A /* InputSourcesManager.swift in Sources */,
+				ED0ED4352DDDF4D3002D8EE2 /* Sources.swift in Sources */,
+				ED9E44FD2DDE18B500543DD4 /* main.swift in Sources */,
+				ED0ED4322DDDED8A002D8EE2 /* Source.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +223,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 6AB7TG5AU6;
@@ -222,6 +288,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 6AB7TG5AU6;
@@ -250,15 +317,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Flang/Flang.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6AB7TG5AU6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Flang;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -278,15 +345,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Flang/Flang.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6AB7TG5AU6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Flang;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

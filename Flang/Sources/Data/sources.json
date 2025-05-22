@@ -1,0 +1,18 @@
+{
+    "ABC": {
+        "name": "English",
+        "name_short": "Eng",
+        "name_native": "English",
+        "name_native_short": "Eng",
+        "flag_emoji": "🇺🇸",
+        "flag_code": "us"
+    },
+    "Russian": {
+        "name": "Russian",
+        "name_short": "Rus",
+        "name_native": "Русский",
+        "name_native_short": "Рус",
+        "flag_emoji": "🇷🇺",
+        "flag_code": "ru"
+    }
+}
