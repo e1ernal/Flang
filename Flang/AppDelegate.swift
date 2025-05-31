@@ -47,20 +47,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, InputSourceMonitoring 
     }
     
     @objc
-    private func selectInputSourcePressed(tag: Int) {
-//        func setInputSource(_ inputSourceID: String) {
-//            let inputSources = TISCreateInputSourceList(nil, false).takeRetainedValue() as! [TISInputSource]
-//            
-//            for source in inputSources {
-//                if let sourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) {
-//                    let id = Unmanaged<CFString>.fromOpaque(sourceID).takeUnretainedValue() as String
-//                    if id == inputSourceID {
-//                        TISSelectInputSource(source)
-//                        break
-//                    }
-//                }
-//            }
-//        }
+    private func selectInputSourcePressed(_ sender: NSMenuItem) {
+        let inputSourceID = "com.apple.keylayout.\(sender.title)"
+        let inputSources = TISCreateInputSourceList(nil, false).takeRetainedValue() as! [TISInputSource]
+        
+        for source in inputSources {
+            if let sourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) {
+                let id = Unmanaged<CFString>.fromOpaque(sourceID).takeUnretainedValue() as String
+                if id == inputSourceID {
+                    TISSelectInputSource(source)
+                    break
+                }
+            }
+        }
     }
     
     // MARK: - Public Methods
@@ -81,7 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, InputSourceMonitoring 
         inputSourceManager.inputSources.forEach { source in
             let sourceItem = NSMenuItem(
                 title: source.name,
-                action: #selector(selectInputSourcePressed),
+                action: #selector(selectInputSourcePressed(_:)),
                 keyEquivalent: ""
             )
             
