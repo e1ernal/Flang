@@ -14,20 +14,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, InputSourceMonitoring 
     // MARK: - Private Properties
     private var statusBar: NSStatusBar
     private var statusBarItem: NSStatusItem
+    private var statusBarItemMenu: NSMenu
     
-    private var inputSource: InputSource
-    
-    private var showInputSourceName: Bool = false {
-        didSet {
-            UserDefaults.standard.set(showInputSourceName, forKey: "showInputSourceName")
-        }
-    }
+    private var inputSourceManager = InputSourceManager()
     
     // MARK: - Initialization
     override init() {
         statusBar = NSStatusBar.system
         statusBarItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
-        inputSource = InputSource()
+        statusBarItemMenu = NSMenu()
         super.init()
     }
     
@@ -37,9 +32,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, InputSourceMonitoring 
     
     // MARK: - Lifecycle
     func applicationWillFinishLaunching(_ notification: Notification) {
-        inputSource.delegate = self
-        showInputSourceName = UserDefaults.standard.bool(forKey: "showInputSourceName")
+        inputSourceManager.delegate = self
     }
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         configureStatusBarItemButton()
         configureStatusBarItemMenu()
@@ -47,70 +42,88 @@ final class AppDelegate: NSObject, NSApplicationDelegate, InputSourceMonitoring 
     
     // MARK: - Actions
     @objc
-    private func showInputSourceNamePressed() {
-        showInputSourceName.toggle()
-    }
-    
-    @objc
     private func quitPressed() {
         NSApplication.shared.terminate(nil)
     }
     
+    @objc
+    private func selectInputSourcePressed(tag: Int) {
+//        func setInputSource(_ inputSourceID: String) {
+//            let inputSources = TISCreateInputSourceList(nil, false).takeRetainedValue() as! [TISInputSource]
+//            
+//            for source in inputSources {
+//                if let sourceID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) {
+//                    let id = Unmanaged<CFString>.fromOpaque(sourceID).takeUnretainedValue() as String
+//                    if id == inputSourceID {
+//                        TISSelectInputSource(source)
+//                        break
+//                    }
+//                }
+//            }
+//        }
+    }
+    
     // MARK: - Public Methods
     func inputSourceDidChange() {
-        statusBarItem.button?.title = inputSource.name
+        updateMenuItem()
     }
     
     // MARK: - Private Methods
     private func configureStatusBarItemButton() {
-        statusBarItem.button?.title = inputSource.name
+        statusBarItem.button?.title = inputSourceManager.inputSource.name
+        statusBarItem.button?.image = inputSourceManager.inputSource.image
     }
     
     private func configureStatusBarItemMenu(){
-        let menu = NSMenu()
-//        
-//        let allSources = InputSourceHelper.getAllInputSources()
-//        for source in allSources {
-//            let item = NSMenuItem(
-//                title: source.name,
-//                action: nil,
-//                keyEquivalent: ""
-//            )
-//            print(source)
-//            print(sources.get(source.id))
-//            item.target = self
-//            let image = NSImage(named: "Flags/ru")
-//            image?.size = CGSize(width: 32.3, height: 16.15)
-//            item.image = image
-//            item.state = .on
-//            menu.addItem(item)
-//        }
-//        
-//        // Show Input Source Name
-//        let showInputSourceNameItem = NSMenuItem(
-//            title: (showInputSourceName ? "Hide" : "Show") + " Input Source Name",
-//            action: #selector(showInputSourceNamePressed),
-//            keyEquivalent: ""
-//        )
-//        
+        statusBarItemMenu = NSMenu()
+        
+        // Input Sources
+        inputSourceManager.inputSources.forEach { source in
+            let sourceItem = NSMenuItem(
+                title: source.name,
+                action: #selector(selectInputSourcePressed),
+                keyEquivalent: ""
+            )
+            
+            sourceItem.image = source.image
+            sourceItem.tag = source.name.hashValue
+            sourceItem.state = source.isSelected ? .on : .off
+            statusBarItemMenu.addItem(sourceItem)
+        }
+        
         // Quit
         let quitItem = NSMenuItem(
             title: "Quit Flang",
             action: #selector(quitPressed),
             keyEquivalent: "q"
         )
-//        
-//        // Targets
-//        showInputSourceNameItem.target = self
-//        quitItem.target = self
-//        
-//        // Add Items
-//        menu.addItem(.separator())
-//        menu.addItem(showInputSourceNameItem)
-//        menu.addItem(.separator())
-        menu.addItem(quitItem)
-//        
-        statusBarItem.menu = menu
+        
+        statusBarItemMenu.addItem(.separator())
+        statusBarItemMenu.addItem(quitItem)
+        
+        statusBarItem.menu = statusBarItemMenu
+    }
+    
+    private func updateMenuItem() {
+        DispatchQueue.main.async {
+            let inputSource = self.inputSourceManager.inputSource
+            let inputSources = self.inputSourceManager.inputSources
+            
+            self.statusBarItem.button?.title = inputSource.name
+            self.statusBarItem.button?.image = inputSource.image
+            
+            self.statusBarItemMenu.items.forEach { item in
+                let inputSource = inputSources.first { inputSource in
+                    item.tag == inputSource.name.hashValue
+                }
+                
+                guard let inputSource else { return }
+                
+                item.title = inputSource.name
+                item.state = inputSource.isSelected ? .on : .off
+            }
+            
+        }
     }
     
     // MARK: - Deinitialization
