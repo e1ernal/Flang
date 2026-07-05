@@ -116,10 +116,12 @@ enum FlagRenderer {
         image.draw(in: NSRect(origin: .zero, size: size))
         NSGraphicsContext.restoreGraphicsState()
 
-        // A clearly visible, theme-adaptive border: labelColor is dark in light
-        // mode and light in dark mode, so a solid-white flag (Japan) stays outlined
-        // against a white menu and a dark flag stays outlined against a dark bar.
-        NSColor.labelColor.withAlphaComponent(0.45).setStroke()
+        // A concrete mid-gray border, NOT a dynamic system color: this image is
+        // drawn off-screen (lockFocus), where dynamic colors like labelColor don't
+        // resolve and the stroke ends up invisible. A fixed mid-gray reads on both
+        // a white menu (light theme) and a dark menu bar, so a solid-white flag
+        // (Japan) stays outlined either way.
+        NSColor(white: 0.4, alpha: 0.75).setStroke()
         path.lineWidth = 1
         path.stroke()
 
