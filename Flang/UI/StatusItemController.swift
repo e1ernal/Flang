@@ -12,11 +12,34 @@ import AppKit
 final class StatusItemController: NSObject {
     private let statusItem: NSStatusItem
     private let manager: InputSourceManager
+    private let flagStore = FlagStore()
+
+    /// Temporary flag-mode storage until the Settings window arrives in Phase 4.
+    private let flagModeDefaultsKey = "TemporaryFlagMode"
+    private var flagMode: FlagStore.Mode {
+        get {
+            let raw = UserDefaults.standard.string(forKey: flagModeDefaultsKey)
+            return raw.flatMap(FlagStore.Mode.init(rawValue:)) ?? .images
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: flagModeDefaultsKey)
+        }
+    }
+
+    /// Flag height for the menu bar indicator: the bar's icon area, so the image
+    /// isn't upscaled and clipped by the button.
+    private var indicatorHeight: CGFloat {
+        max(FlagRenderer.menuHeight, NSStatusBar.system.thickness - 4)
+    }
 
     init(manager: InputSourceManager) {
         self.manager = manager
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
+
+        // Never enlarge the flag to fill the button (which cropped tall/light flags);
+        // only shrink to fit, preserving aspect ratio.
+        statusItem.button?.imageScaling = .scaleProportionallyDown
 
         manager.delegate = self
         rebuildMenu()
@@ -33,19 +56,31 @@ final class StatusItemController: NSObject {
     }
 
     @objc
+    private func flagModeChanged(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String,
+              let mode = FlagStore.Mode(rawValue: raw) else { return }
+        flagMode = mode
+        rebuildMenu()
+        updateIndicator(for: manager.currentInputSource)
+    }
+
+    @objc
     private func quitClicked() {
         NSApplication.shared.terminate(nil)
     }
 
     // MARK: - UI updates
 
-    /// Refresh the menu bar indicator to show the given active source.
+    /// Refresh the menu bar indicator to show the given active source's flag.
     /// Leaves the indicator untouched when the source can't be read (`nil`).
     private func updateIndicator(for source: InputSource?) {
         guard let button = statusItem.button else { return }
         guard let source else { return }
-        button.title = source.name
-        button.image = source.image
+        let image = flagStore.image(for: source, mode: flagMode, height: indicatorHeight)
+        image.accessibilityDescription = source.name
+        button.image = image
+        button.imagePosition = .imageOnly
+        button.title = ""
     }
 
     /// Rebuild the whole menu from the current list of enabled sources.
@@ -59,12 +94,14 @@ final class StatusItemController: NSObject {
                 keyEquivalent: ""
             )
             item.target = self
-            item.image = source.image
+            item.image = flagStore.image(for: source, mode: flagMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
             menu.addItem(item)
         }
 
+        menu.addItem(.separator())
+        menu.addItem(makeFlagModeItem())
         menu.addItem(.separator())
 
         let quitItem = NSMenuItem(
@@ -76,6 +113,29 @@ final class StatusItemController: NSObject {
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+    }
+
+    /// Temporary flag-mode switcher; moves into the Settings window in Phase 4.
+    private func makeFlagModeItem() -> NSMenuItem {
+        let submenu = NSMenu()
+        let options: [(mode: FlagStore.Mode, title: String)] = [
+            (.images, "Images"),
+            (.emoji, "Emoji")
+        ]
+        for option in options {
+            let item = NSMenuItem(
+                title: option.title,
+                action: #selector(flagModeChanged(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.representedObject = option.mode.rawValue
+            item.state = (option.mode == flagMode) ? .on : .off
+            submenu.addItem(item)
+        }
+        let parent = NSMenuItem(title: "Flag Style (temporary)", action: nil, keyEquivalent: "")
+        parent.submenu = submenu
+        return parent
     }
 
     /// Move the checkmark to the active source without rebuilding the menu.
