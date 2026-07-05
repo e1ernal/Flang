@@ -26,10 +26,20 @@ final class StatusItemController: NSObject {
         }
     }
 
+    /// Flag height for the menu bar indicator: the bar's icon area, so the image
+    /// isn't upscaled and clipped by the button.
+    private var indicatorHeight: CGFloat {
+        max(FlagRenderer.menuHeight, NSStatusBar.system.thickness - 4)
+    }
+
     init(manager: InputSourceManager) {
         self.manager = manager
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
+
+        // Never enlarge the flag to fill the button (which cropped tall/light flags);
+        // only shrink to fit, preserving aspect ratio.
+        statusItem.button?.imageScaling = .scaleProportionallyDown
 
         manager.delegate = self
         rebuildMenu()
@@ -66,7 +76,7 @@ final class StatusItemController: NSObject {
     private func updateIndicator(for source: InputSource?) {
         guard let button = statusItem.button else { return }
         guard let source else { return }
-        let image = flagStore.menuBarImage(for: source, mode: flagMode)
+        let image = flagStore.image(for: source, mode: flagMode, height: indicatorHeight)
         image.accessibilityDescription = source.name
         button.image = image
         button.imagePosition = .imageOnly
@@ -84,7 +94,7 @@ final class StatusItemController: NSObject {
                 keyEquivalent: ""
             )
             item.target = self
-            item.image = flagStore.menuBarImage(for: source, mode: flagMode)
+            item.image = flagStore.image(for: source, mode: flagMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
             menu.addItem(item)

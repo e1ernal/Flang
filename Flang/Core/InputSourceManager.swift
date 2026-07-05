@@ -26,8 +26,10 @@ struct InputSource {
     /// Input languages, most representative first (`kTISPropertyInputSourceLanguages`).
     /// Used by `FlagStore` for the language -> country fallback (FR-6, step 3).
     let languages: [String]
-    /// The source's own system icon, used as a last-resort fallback flag (FR-3).
-    let systemIcon: NSImage?
+    /// URL of the source's own system icon, loaded lazily by `FlagStore` only when
+    /// the fallback icon is actually needed (FR-3). Storing the URL (not the image)
+    /// keeps building sources cheap on the hot switch/rebuild path.
+    let systemIconURL: URL?
 }
 
 /// Delegate notified when the active source or the set of enabled sources changes.
@@ -96,7 +98,7 @@ final class InputSourceManager {
             name: name,
             isSelected: id == currentID,
             languages: source.languages,
-            systemIcon: source.systemIcon
+            systemIconURL: source.iconImageURL
         )
     }
 
@@ -146,9 +148,7 @@ private extension TISInputSource {
     var isSelectable: Bool { property(kTISPropertyInputSourceIsSelectCapable, as: Bool.self) ?? false }
     var languages: [String] { property(kTISPropertyInputSourceLanguages, as: [String].self) ?? [] }
 
-    /// The source's icon loaded from `kTISPropertyIconImageURL`, if the system provides one.
-    var systemIcon: NSImage? {
-        guard let url = property(kTISPropertyIconImageURL, as: URL.self) else { return nil }
-        return NSImage(contentsOf: url)
-    }
+    /// URL of the source's icon (`kTISPropertyIconImageURL`), if the system provides one.
+    /// The image itself is loaded lazily by `FlagStore` only when needed.
+    var iconImageURL: URL? { property(kTISPropertyIconImageURL, as: URL.self) }
 }

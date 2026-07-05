@@ -44,30 +44,33 @@ final class FlagStore {
         return nil
     }
 
-    /// A menu-bar-ready image for the source in the chosen mode, falling back to
-    /// the source's system icon or a globe when no flag is known (FR-3).
-    func menuBarImage(for source: InputSource, mode: Mode) -> NSImage {
+    /// An image for the source at the given height, in the chosen mode, falling
+    /// back to the source's system icon or a globe when no flag is known (FR-3).
+    func image(for source: InputSource, mode: Mode, height: CGFloat) -> NSImage {
         guard let code = countryCode(for: source) else {
-            return fallbackImage(for: source)
+            return fallbackImage(for: source, height: height)
         }
         switch mode {
         case .images:
             if let flag = NSImage(named: code) {
-                return FlagRenderer.flag(flag)
+                return FlagRenderer.flag(flag, height: height)
             }
         case .emoji:
             if let emoji = FlagStore.emojiFlag(for: code) {
-                return FlagRenderer.emoji(emoji)
+                return FlagRenderer.emoji(emoji, height: height)
             }
         }
-        return fallbackImage(for: source)
+        return fallbackImage(for: source, height: height)
     }
 
-    private func fallbackImage(for source: InputSource) -> NSImage {
-        if let icon = source.systemIcon {
-            return FlagRenderer.icon(icon)
+    /// Load the source's system icon lazily (only now, when a fallback is needed)
+    /// and draw it as a template so a monochrome glyph stays visible on any theme.
+    /// If there is no icon, use the globe.
+    private func fallbackImage(for source: InputSource, height: CGFloat) -> NSImage {
+        if let url = source.systemIconURL, let icon = NSImage(contentsOf: url) {
+            return FlagRenderer.icon(icon, height: height)
         }
-        return FlagRenderer.globe()
+        return FlagRenderer.globe(height: height)
     }
 
     /// Convert a two-letter country code into its emoji flag via regional indicators.
@@ -91,16 +94,16 @@ private struct FlagMap: Decodable {
     let languages: [String: String]
 }
 
-/// Draws flags at a consistent menu-bar size.
+/// Draws flags at a requested height for the menu bar or the drop-down menu.
 enum FlagRenderer {
-    /// Flag height in the menu bar (FR-14): about 16 pt.
-    static let barHeight: CGFloat = 16
+    /// Default flag height inside the drop-down menu (FR-14): about 16 pt.
+    static let menuHeight: CGFloat = 16
     private static let cornerRadius: CGFloat = 2
 
     /// A colored 4:3 flag with rounded corners and a hairline translucent border,
     /// so light flags (e.g. Japan) don't blend into a light menu bar.
-    static func flag(_ image: NSImage) -> NSImage {
-        let size = NSSize(width: (barHeight * 4 / 3).rounded(), height: barHeight)
+    static func flag(_ image: NSImage, height: CGFloat) -> NSImage {
+        let size = NSSize(width: (height * 4 / 3).rounded(), height: height)
         let output = NSImage(size: size)
         output.lockFocus()
         defer { output.unlockFocus() }
@@ -113,7 +116,7 @@ enum FlagRenderer {
         image.draw(in: NSRect(origin: .zero, size: size))
         NSGraphicsContext.restoreGraphicsState()
 
-        NSColor.labelColor.withAlphaComponent(0.15).setStroke()
+        NSColor.labelColor.withAlphaComponent(0.3).setStroke()
         path.lineWidth = 1
         path.stroke()
 
@@ -121,33 +124,37 @@ enum FlagRenderer {
         return output
     }
 
-    /// The emoji flag rendered as an image of the same height as picture flags.
-    static func emoji(_ emoji: String) -> NSImage {
-        let string = NSAttributedString(string: emoji, attributes: [.font: NSFont.systemFont(ofSize: 14)])
+    /// The emoji flag rendered as an image, sized so the glyph is never clipped.
+    static func emoji(_ emoji: String, height: CGFloat) -> NSImage {
+        let string = NSAttributedString(
+            string: emoji,
+            attributes: [.font: NSFont.systemFont(ofSize: max(1, height - 2))]
+        )
         let textSize = string.size()
-        let size = NSSize(width: ceil(textSize.width), height: barHeight)
+        let size = NSSize(width: ceil(textSize.width), height: max(height, ceil(textSize.height)))
         let output = NSImage(size: size)
         output.lockFocus()
         defer { output.unlockFocus() }
-        string.draw(at: NSPoint(x: 0, y: (barHeight - textSize.height) / 2))
+        string.draw(at: NSPoint(x: 0, y: (size.height - textSize.height) / 2))
         output.isTemplate = false
         return output
     }
 
-    /// The source's own system icon, scaled to menu-bar height.
-    static func icon(_ icon: NSImage) -> NSImage {
-        let size = NSSize(width: barHeight, height: barHeight)
+    /// The source's own system icon, scaled to height and drawn as a template so a
+    /// monochrome glyph adapts to a light or dark menu bar (instead of a black blob).
+    static func icon(_ icon: NSImage, height: CGFloat) -> NSImage {
+        let size = NSSize(width: height, height: height)
         let output = NSImage(size: size)
         output.lockFocus()
         defer { output.unlockFocus() }
         icon.draw(in: NSRect(origin: .zero, size: size))
-        output.isTemplate = false
+        output.isTemplate = true
         return output
     }
 
     /// Last-resort globe symbol (template, so it adapts to light/dark menu bars).
-    static func globe() -> NSImage {
-        let configuration = NSImage.SymbolConfiguration(pointSize: 13, weight: .regular)
+    static func globe(height: CGFloat) -> NSImage {
+        let configuration = NSImage.SymbolConfiguration(pointSize: height - 3, weight: .regular)
         let globe = NSImage(systemSymbolName: "globe", accessibilityDescription: nil)?
             .withSymbolConfiguration(configuration)
         globe?.isTemplate = true
