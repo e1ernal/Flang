@@ -116,7 +116,10 @@ enum FlagRenderer {
         image.draw(in: NSRect(origin: .zero, size: size))
         NSGraphicsContext.restoreGraphicsState()
 
-        NSColor.labelColor.withAlphaComponent(0.3).setStroke()
+        // A clearly visible, theme-adaptive border: labelColor is dark in light
+        // mode and light in dark mode, so a solid-white flag (Japan) stays outlined
+        // against a white menu and a dark flag stays outlined against a dark bar.
+        NSColor.labelColor.withAlphaComponent(0.45).setStroke()
         path.lineWidth = 1
         path.stroke()
 

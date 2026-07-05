@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 #
-# Import flag-icons 4x3 SVGs into the app's asset catalog with vector data
-# preserved, so a single SVG renders crisply at any size (menu bar and beyond).
+# Import flag-icons 4x3 flags into the app's asset catalog as vector PDFs, so a
+# single asset renders crisply at any size (menu bar and beyond).
 #
+# Why PDF and not the original SVG: Apple's asset-catalog SVG rasterizer does not
+# support `clipPath` / `<use>`, which many flag-icons files rely on, producing
+# broken (partly transparent) flags. So we render each SVG with a full SVG engine
+# (librsvg) into a vector PDF, the format the asset catalog handles natively.
+#
+# Requires: rsvg-convert (brew install librsvg).
 # Source: https://github.com/lipis/flag-icons (MIT). See FR-14.
 #
 # Usage:
@@ -14,6 +20,11 @@
 # flag-icons archive or its extracted folder.
 #
 set -euo pipefail
+
+if ! command -v rsvg-convert >/dev/null 2>&1; then
+  echo "error: rsvg-convert not found. Install it with: brew install librsvg" >&2
+  exit 1
+fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CATALOG="$REPO_ROOT/Flang/Resources/Assets.xcassets"
@@ -57,12 +68,13 @@ for svg in "$FOURBYTHREE"/*.svg; do
   code="$(basename "$svg" .svg)"
   imageset="$FLAGS_GROUP/$code.imageset"
   mkdir -p "$imageset"
-  cp "$svg" "$imageset/$code.svg"
+  # Render with librsvg (full SVG support) into a vector PDF for the asset catalog.
+  rsvg-convert -f pdf "$svg" -o "$imageset/$code.pdf"
   cat > "$imageset/Contents.json" <<JSON
 {
   "images" : [
     {
-      "filename" : "$code.svg",
+      "filename" : "$code.pdf",
       "idiom" : "universal"
     }
   ],
