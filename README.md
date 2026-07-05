@@ -66,8 +66,8 @@ Nothing about you or your system is ever sent anywhere.
 
 - [x] Menu bar indicator with a flag for the current input source
 - [x] Switch input sources from the dropdown menu
-- [ ] Default flag map for all macOS layouts and input methods
-- [ ] Image and emoji flag modes
+- [x] Default flag map for all macOS layouts and input methods
+- [x] Image and emoji flag modes
 - [ ] Six display styles
 - [ ] Settings window: custom flag, short and full name per language
 - [ ] Start at login, first-launch tips

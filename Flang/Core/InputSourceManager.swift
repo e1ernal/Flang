@@ -23,8 +23,13 @@ struct InputSource {
     let name: String
     /// Whether this source is the currently active one.
     let isSelected: Bool
-    /// Flag or icon image; may be nil when no asset matches (temporary until Phase 2).
-    let image: NSImage?
+    /// Input languages, most representative first (`kTISPropertyInputSourceLanguages`).
+    /// Used by `FlagStore` for the language -> country fallback (FR-6, step 3).
+    let languages: [String]
+    /// URL of the source's own system icon, loaded lazily by `FlagStore` only when
+    /// the fallback icon is actually needed (FR-3). Storing the URL (not the image)
+    /// keeps building sources cheap on the hot switch/rebuild path.
+    let systemIconURL: URL?
 }
 
 /// Delegate notified when the active source or the set of enabled sources changes.
@@ -41,7 +46,6 @@ final class InputSourceManager {
     weak var delegate: InputSourceMonitoring?
 
     private let notificationCenter: CFNotificationCenter
-    private let imageSize = CGSize(width: 24, height: 18)
 
     init() {
         notificationCenter = CFNotificationCenterGetDistributedCenter()
@@ -89,9 +93,13 @@ final class InputSourceManager {
     /// Build an `InputSource`; returns nil when a source lacks an id or name.
     private func makeInputSource(from source: TISInputSource, currentID: String?) -> InputSource? {
         guard let id = source.id, let name = source.name else { return nil }
-        let image = NSImage(named: name)
-        image?.size = imageSize
-        return InputSource(id: id, name: name, isSelected: id == currentID, image: image)
+        return InputSource(
+            id: id,
+            name: name,
+            isSelected: id == currentID,
+            languages: source.languages,
+            systemIconURL: source.iconImageURL
+        )
     }
 
     private func registerForNotifications() {
@@ -138,4 +146,9 @@ private extension TISInputSource {
     var name: String? { property(kTISPropertyLocalizedName, as: String.self) }
     var category: String? { property(kTISPropertyInputSourceCategory, as: String.self) }
     var isSelectable: Bool { property(kTISPropertyInputSourceIsSelectCapable, as: Bool.self) ?? false }
+    var languages: [String] { property(kTISPropertyInputSourceLanguages, as: [String].self) ?? [] }
+
+    /// URL of the source's icon (`kTISPropertyIconImageURL`), if the system provides one.
+    /// The image itself is loaded lazily by `FlagStore` only when needed.
+    var iconImageURL: URL? { property(kTISPropertyIconImageURL, as: URL.self) }
 }
