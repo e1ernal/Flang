@@ -7,6 +7,13 @@
 
 import AppKit
 import Carbon
+import os
+
+/// Unified logging for input-source handling (visible in Console.app / `log stream`).
+private let logger = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "Flang",
+    category: "InputSource"
+)
 
 /// A single keyboard input source (layout or input method), reduced to what Flang shows.
 struct InputSource {
@@ -73,7 +80,10 @@ final class InputSourceManager {
               let match = list.first(where: { $0.id == id }) else {
             return
         }
-        TISSelectInputSource(match)
+        let status = TISSelectInputSource(match)
+        if status != noErr {
+            logger.error("Failed to switch to input source \(id, privacy: .public): OSStatus \(status)")
+        }
     }
 
     /// Build an `InputSource`; returns nil when a source lacks an id or name.

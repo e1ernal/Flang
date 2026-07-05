@@ -20,7 +20,7 @@ final class StatusItemController: NSObject {
 
         manager.delegate = self
         rebuildMenu()
-        updateIndicator()
+        updateIndicator(for: manager.currentInputSource)
     }
 
     // MARK: - Actions
@@ -39,10 +39,11 @@ final class StatusItemController: NSObject {
 
     // MARK: - UI updates
 
-    /// Refresh the menu bar indicator to show the active source.
-    private func updateIndicator() {
+    /// Refresh the menu bar indicator to show the given active source.
+    /// Leaves the indicator untouched when the source can't be read (`nil`).
+    private func updateIndicator(for source: InputSource?) {
         guard let button = statusItem.button else { return }
-        guard let source = manager.currentInputSource else { return }
+        guard let source else { return }
         button.title = source.name
         button.image = source.image
     }
@@ -78,9 +79,8 @@ final class StatusItemController: NSObject {
     }
 
     /// Move the checkmark to the active source without rebuilding the menu.
-    private func updateMenuSelection() {
+    private func updateMenuSelection(currentID: String?) {
         guard let menu = statusItem.menu else { return }
-        let currentID = manager.currentInputSource?.id
         for item in menu.items {
             guard let id = item.representedObject as? String else { continue }
             item.state = (id == currentID) ? .on : .off
@@ -92,12 +92,14 @@ final class StatusItemController: NSObject {
 
 extension StatusItemController: InputSourceMonitoring {
     func selectedInputSourceDidChange() {
-        updateIndicator()
-        updateMenuSelection()
+        // Read the current source once and reuse it for both UI updates.
+        let current = manager.currentInputSource
+        updateIndicator(for: current)
+        updateMenuSelection(currentID: current?.id)
     }
 
     func enabledInputSourcesDidChange() {
         rebuildMenu()
-        updateIndicator()
+        updateIndicator(for: manager.currentInputSource)
     }
 }
