@@ -30,6 +30,22 @@ struct InputSource {
     /// the fallback icon is actually needed (FR-3). Storing the URL (not the image)
     /// keeps building sources cheap on the hot switch/rebuild path.
     let systemIconURL: URL?
+
+    /// Short abbreviation for the compact indicator styles (FR-4). macOS has no
+    /// public API for the exact menu-bar abbreviation, so we approximate: a name
+    /// that is already short (e.g. "ABC") is used as-is; otherwise the primary
+    /// language subtag uppercased (e.g. "Spanish" -> "ES", "zh-Hant" -> "ZH");
+    /// failing that, a short prefix of the name. Users can override it in Phase 4.
+    var shortName: String {
+        if name.count <= 4 {
+            return name
+        }
+        if let language = languages.first, !language.isEmpty {
+            let base = language.split(separator: "-").first.map(String.init) ?? language
+            return base.uppercased()
+        }
+        return String(name.prefix(3)).uppercased()
+    }
 }
 
 /// Delegate notified when the active source or the set of enabled sources changes.

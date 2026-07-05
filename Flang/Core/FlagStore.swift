@@ -67,10 +67,19 @@ final class FlagStore {
     /// and draw it as a template so a monochrome glyph stays visible on any theme.
     /// If there is no icon, use the globe.
     private func fallbackImage(for source: InputSource, height: CGFloat) -> NSImage {
-        if let url = source.systemIconURL, let icon = NSImage(contentsOf: url) {
-            return FlagRenderer.icon(icon, height: height)
+        if let icon = systemIcon(for: source, height: height) {
+            return icon
         }
         return FlagRenderer.globe(height: height)
+    }
+
+    /// The source's own macOS icon rendered for the menu bar, or nil if it has none.
+    /// Used by the "System" indicator style (FR-4) and the fallback path (FR-3).
+    func systemIcon(for source: InputSource, height: CGFloat) -> NSImage? {
+        guard let url = source.systemIconURL, let icon = NSImage(contentsOf: url) else {
+            return nil
+        }
+        return FlagRenderer.icon(icon, height: height)
     }
 
     /// Convert a two-letter country code into its emoji flag via regional indicators.

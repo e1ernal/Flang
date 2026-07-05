@@ -13,18 +13,11 @@ final class StatusItemController: NSObject {
     private let statusItem: NSStatusItem
     private let manager: InputSourceManager
     private let flagStore = FlagStore()
+    private let settings = SettingsStore()
 
-    /// Temporary flag-mode storage until the Settings window arrives in Phase 4.
-    private let flagModeDefaultsKey = "TemporaryFlagMode"
-    private var flagMode: FlagStore.Mode {
-        get {
-            let raw = UserDefaults.standard.string(forKey: flagModeDefaultsKey)
-            return raw.flatMap(FlagStore.Mode.init(rawValue:)) ?? .images
-        }
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: flagModeDefaultsKey)
-        }
-    }
+    /// Longest full-name text shown in the indicator before it is ellipsized
+    /// (SPEC section 5: styles 4/6 cap the indicator width).
+    private let maxIndicatorTitleLength = 16
 
     /// Flag height for the menu bar indicator: the bar's icon area, so the image
     /// isn't upscaled and clipped by the button.
@@ -56,10 +49,19 @@ final class StatusItemController: NSObject {
     }
 
     @objc
+    private func indicatorStyleChanged(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String,
+              let style = SettingsStore.IndicatorStyle(rawValue: raw) else { return }
+        settings.indicatorStyle = style
+        rebuildMenu()
+        updateIndicator(for: manager.currentInputSource)
+    }
+
+    @objc
     private func flagModeChanged(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String,
               let mode = FlagStore.Mode(rawValue: raw) else { return }
-        flagMode = mode
+        settings.flagMode = mode
         rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
     }
@@ -71,19 +73,62 @@ final class StatusItemController: NSObject {
 
     // MARK: - UI updates
 
-    /// Refresh the menu bar indicator to show the given active source's flag.
-    /// Leaves the indicator untouched when the source can't be read (`nil`).
+    /// Refresh the menu bar indicator for the active source in the selected style
+    /// (FR-4). Leaves the indicator untouched when the source can't be read (`nil`).
     private func updateIndicator(for source: InputSource?) {
         guard let button = statusItem.button else { return }
         guard let source else { return }
-        let image = flagStore.image(for: source, mode: flagMode, height: indicatorHeight)
-        image.accessibilityDescription = source.name
-        button.image = image
-        button.imagePosition = .imageOnly
+
+        let mode = settings.flagMode
+        button.image = nil
         button.title = ""
+
+        switch settings.indicatorStyle {
+        case .system:
+            if let icon = flagStore.systemIcon(for: source, height: indicatorHeight) {
+                setIndicator(button, image: icon, title: nil, source: source)
+            } else {
+                // No system icon (most keyboard layouts): the abbreviation is the
+                // closest match to what macOS shows.
+                setIndicator(button, image: nil, title: source.shortName, source: source)
+            }
+        case .flag:
+            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
+            setIndicator(button, image: flag, title: nil, source: source)
+        case .flagShort:
+            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
+            setIndicator(button, image: flag, title: source.shortName, source: source)
+        case .flagFull:
+            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
+            setIndicator(button, image: flag, title: truncated(source.name), source: source)
+        case .short:
+            setIndicator(button, image: nil, title: source.shortName, source: source)
+        case .full:
+            setIndicator(button, image: nil, title: truncated(source.name), source: source)
+        }
     }
 
-    /// Rebuild the whole menu from the current list of enabled sources.
+    private func setIndicator(_ button: NSStatusBarButton, image: NSImage?, title: String?, source: InputSource) {
+        image?.accessibilityDescription = source.name
+        button.image = image
+        button.title = title ?? ""
+        if image != nil && title != nil {
+            button.imagePosition = .imageLeading
+        } else if image != nil {
+            button.imagePosition = .imageOnly
+        } else {
+            button.imagePosition = .noImage
+        }
+    }
+
+    /// Truncate long text with a middle-less tail ellipsis for the indicator.
+    private func truncated(_ text: String) -> String {
+        guard text.count > maxIndicatorTitleLength else { return text }
+        return String(text.prefix(maxIndicatorTitleLength - 1)) + "…"
+    }
+
+    /// Rebuild the whole menu. Menu items always show flag + full name regardless
+    /// of the indicator style (FR-2).
     private func rebuildMenu() {
         let menu = NSMenu()
 
@@ -94,13 +139,15 @@ final class StatusItemController: NSObject {
                 keyEquivalent: ""
             )
             item.target = self
-            item.image = flagStore.image(for: source, mode: flagMode, height: FlagRenderer.menuHeight)
+            item.image = flagStore.image(for: source, mode: settings.flagMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
+            item.toolTip = source.name
             menu.addItem(item)
         }
 
         menu.addItem(.separator())
+        menu.addItem(makeIndicatorStyleItem())
         menu.addItem(makeFlagModeItem())
         menu.addItem(.separator())
 
@@ -115,13 +162,40 @@ final class StatusItemController: NSObject {
         statusItem.menu = menu
     }
 
+    /// Temporary indicator-style switcher; moves into the Settings window in Phase 4.
+    private func makeIndicatorStyleItem() -> NSMenuItem {
+        let options: [(style: SettingsStore.IndicatorStyle, title: String)] = [
+            (.system, "System"),
+            (.flag, "Flag"),
+            (.flagShort, "Flag + short name"),
+            (.flagFull, "Flag + full name"),
+            (.short, "Short name"),
+            (.full, "Full name")
+        ]
+        let submenu = NSMenu()
+        for option in options {
+            let item = NSMenuItem(
+                title: option.title,
+                action: #selector(indicatorStyleChanged(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.representedObject = option.style.rawValue
+            item.state = (option.style == settings.indicatorStyle) ? .on : .off
+            submenu.addItem(item)
+        }
+        let parent = NSMenuItem(title: "Indicator Style (temporary)", action: nil, keyEquivalent: "")
+        parent.submenu = submenu
+        return parent
+    }
+
     /// Temporary flag-mode switcher; moves into the Settings window in Phase 4.
     private func makeFlagModeItem() -> NSMenuItem {
-        let submenu = NSMenu()
         let options: [(mode: FlagStore.Mode, title: String)] = [
             (.images, "Images"),
             (.emoji, "Emoji")
         ]
+        let submenu = NSMenu()
         for option in options {
             let item = NSMenuItem(
                 title: option.title,
@@ -130,10 +204,10 @@ final class StatusItemController: NSObject {
             )
             item.target = self
             item.representedObject = option.mode.rawValue
-            item.state = (option.mode == flagMode) ? .on : .off
+            item.state = (option.mode == settings.flagMode) ? .on : .off
             submenu.addItem(item)
         }
-        let parent = NSMenuItem(title: "Flag Style (temporary)", action: nil, keyEquivalent: "")
+        let parent = NSMenuItem(title: "Flag Mode (temporary)", action: nil, keyEquivalent: "")
         parent.submenu = submenu
         return parent
     }
