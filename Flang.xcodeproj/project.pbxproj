@@ -6,23 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		ED0ED4252DDDD4DF002D8EE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */; };
-		ED0ED4272DDDD4DF002D8EE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */; };
-		ED52683E2DE12DA400EFC43C /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED52683D2DE12DA200EFC43C /* InputSourceManager.swift */; };
-		ED9E44FD2DDE18B500543DD4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9E44FC2DDE18B300543DD4 /* main.swift */; };
-		ED9E44FF2DDE1EB000543DD4 /* flags.zip in Resources */ = {isa = PBXBuildFile; fileRef = ED9E44FE2DDE1EB000543DD4 /* flags.zip */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		ED0ED3FC2DDDCA63002D8EE2 /* Flang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flang.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		ED0ED4212DDDD4DF002D8EE2 /* Flang.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Flang.entitlements; sourceTree = "<group>"; };
-		ED52683D2DE12DA200EFC43C /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
-		ED9E44FC2DDE18B300543DD4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		ED9E44FE2DDE1EB000543DD4 /* flags.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = flags.zip; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		ED0ED4232DDDD4DF002D8EE2 /* Flang */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Flang;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		ED0ED3F92DDDCA63002D8EE2 /* Frameworks */ = {
@@ -51,27 +45,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		ED0ED4232DDDD4DF002D8EE2 /* Flang */ = {
-			isa = PBXGroup;
-			children = (
-				ED9E44FC2DDE18B300543DD4 /* main.swift */,
-				ED0ED41F2DDDD4DF002D8EE2 /* AppDelegate.swift */,
-				ED52683D2DE12DA200EFC43C /* InputSourceManager.swift */,
-				ED0ED4282DDDD5F0002D8EE2 /* Application Layer */,
-			);
-			path = Flang;
-			sourceTree = "<group>";
-		};
-		ED0ED4282DDDD5F0002D8EE2 /* Application Layer */ = {
-			isa = PBXGroup;
-			children = (
-				ED0ED4202DDDD4DF002D8EE2 /* Assets.xcassets */,
-				ED0ED4212DDDD4DF002D8EE2 /* Flang.entitlements */,
-				ED9E44FE2DDE1EB000543DD4 /* flags.zip */,
-			);
-			path = "Application Layer";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -86,6 +59,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				ED0ED4232DDDD4DF002D8EE2 /* Flang */,
 			);
 			name = Flang;
 			packageProductDependencies = (
@@ -133,8 +109,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED9E44FF2DDE1EB000543DD4 /* flags.zip in Resources */,
-				ED0ED4272DDDD4DF002D8EE2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,9 +119,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED0ED4252DDDD4DF002D8EE2 /* AppDelegate.swift in Sources */,
-				ED52683E2DE12DA400EFC43C /* InputSourceManager.swift in Sources */,
-				ED9E44FD2DDE18B500543DD4 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +158,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Flang/App/Flang.entitlements";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -210,7 +181,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -253,7 +224,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Flang/App/Flang.entitlements";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -270,7 +241,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -283,7 +254,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Flang/App/Flang.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -313,7 +284,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Flang/Application Layer/Flang.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Flang/App/Flang.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
