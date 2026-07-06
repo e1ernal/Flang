@@ -114,33 +114,37 @@ final class InputSourceManager {
         }
     }
 
-    /// Whether an input source with this id is installed. Used to hide menu items
+    /// Whether an enabled input source with this id exists. Used to hide menu items
     /// whose system mechanism is unavailable (FR-2 degradation rule).
-    func isSourceInstalled(id: String) -> Bool {
-        installedSource(id: id) != nil
+    func isSourceEnabled(id: String) -> Bool {
+        enabledSource(id: id) != nil
     }
 
-    /// Activate an installed source by id — used for palette sources like the
-    /// Keyboard Viewer (`com.apple.KeyboardViewer`), which aren't in the enabled list.
+    /// Activate an enabled source by id — used for palette sources like the Character
+    /// Viewer (`com.apple.CharacterPaletteIM`).
     func activateSource(id: String) {
-        guard let source = installedSource(id: id) else { return }
+        guard let source = enabledSource(id: id) else { return }
         let status = TISSelectInputSource(source)
         if status != noErr {
             logger.error("Failed to activate source \(id, privacy: .public): OSStatus \(status)")
         }
     }
 
-    private func installedSource(id: String) -> TISInputSource? {
-        guard let list = TISCreateInputSourceList(nil, true)?.takeRetainedValue() as? [TISInputSource] else {
+    /// Look up a source among the *enabled* ones. We must not use
+    /// `TISCreateInputSourceList(nil, true)` (all installed): that call has a nasty
+    /// side effect of re-enabling every installed source, which made removed
+    /// layouts reappear in the menu.
+    private func enabledSource(id: String) -> TISInputSource? {
+        guard let list = TISCreateInputSourceList(nil, false)?.takeRetainedValue() as? [TISInputSource] else {
             return nil
         }
         return list.first { $0.id == id }
     }
 
-    /// The system icon of an installed source (e.g. the Character Viewer palette),
+    /// The system icon of an enabled source (e.g. the Character Viewer palette),
     /// used to give parity menu items their real macOS icon (FR-2).
     func icon(forSourceID id: String) -> NSImage? {
-        guard let source = installedSource(id: id), let url = source.iconImageURL else { return nil }
+        guard let source = enabledSource(id: id), let url = source.iconImageURL else { return nil }
         return NSImage(contentsOf: url)
     }
 

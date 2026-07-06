@@ -178,7 +178,7 @@ final class StatusItemController: NSObject {
         let menu = NSMenu()
         let sources = manager.inputSources
         let menuMode = settings.menuFlagMode
-        let hasKeyboardViewer = manager.isSourceInstalled(id: keyboardViewerID)
+        let hasKeyboardViewer = manager.isSourceEnabled(id: keyboardViewerID)
 
         // Right edge for the Flag/Name value, aligned near the submenu arrow like the
         // system menus, computed from the widest item so it hugs the menu's edge.
@@ -294,8 +294,8 @@ final class StatusItemController: NSObject {
             (text as NSString).size(withAttributes: [.font: font]).width
         }
         // Approximate leading room (state column + icon) so the value right-aligns
-        // near the submenu arrow at the menu's natural width.
-        let iconIndent: CGFloat = 34
+        // hard against the submenu arrow.
+        let iconIndent: CGFloat = 44
         var edge: CGFloat = width("Show Emoji & Symbols") + iconIndent
         edge = max(edge, width("Open Keyboard Settings…") + iconIndent)
         if hasKeyboardViewer {
