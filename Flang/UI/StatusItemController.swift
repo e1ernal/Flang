@@ -15,8 +15,9 @@ final class StatusItemController: NSObject {
     private let flagStore = FlagStore()
     private let settings = SettingsStore()
 
-    /// Palette input source that opens the Keyboard Viewer window.
+    /// Palette input sources activated for the parity menu items.
     private let keyboardViewerID = "com.apple.KeyboardViewer"
+    private let characterPaletteID = "com.apple.CharacterPaletteIM"
 
     /// Longest full-name text shown in the indicator before it is ellipsized
     /// (SPEC section 5: cap the indicator width).
@@ -70,17 +71,13 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func showEmojiSymbols() {
-        NSApp.orderFrontCharacterPalette(nil)
+        // Activating the Character Palette source opens the Emoji & Symbols window
+        // system-wide (orderFrontCharacterPalette does nothing for a menu-bar agent).
+        manager.activateSource(id: characterPaletteID)
     }
 
     @objc private func showKeyboardViewer() {
         manager.activateSource(id: keyboardViewerID)
-    }
-
-    @objc private func editTextSubstitutions() {
-        // Deep link to Text Replacements; System Settings falls back to the Keyboard
-        // pane when the anchor is unknown on this macOS (FR-2 degradation).
-        openSystemSettings(anchor: "com.apple.Keyboard-Settings.extension?TextReplacement")
     }
 
     @objc private func openKeyboardSettings() {
@@ -182,6 +179,10 @@ final class StatusItemController: NSObject {
         }
 
         menu.addItem(.separator())
+        menu.addItem(makeFlagSettingItem())
+        menu.addItem(makeNameSettingItem())
+
+        menu.addItem(.separator())
         for item in makeParityItems() {
             menu.addItem(item)
         }
@@ -189,14 +190,10 @@ final class StatusItemController: NSObject {
         statusItem.menu = menu
     }
 
-    /// The "…" app submenu (FR-5): flag and name settings, then Quit. The Settings
-    /// window entry is added in Phase 4b once the window exists.
+    /// The "…" app submenu (FR-5). For now it holds only Quit; the Settings window
+    /// entry is added in Phase 4b once the window exists.
     private func makeAppSubmenuItem() -> NSMenuItem {
         let submenu = NSMenu()
-        submenu.addItem(makeFlagSettingItem())
-        submenu.addItem(makeNameSettingItem())
-        submenu.addItem(.separator())
-
         let quitItem = NSMenuItem(title: "Quit Flang", action: #selector(quitClicked), keyEquivalent: "q")
         quitItem.target = self
         submenu.addItem(quitItem)
@@ -252,38 +249,51 @@ final class StatusItemController: NSObject {
         return parent
     }
 
-    /// A menu title with the current value right-aligned in gray, like system menus
-    /// (FR-5), so the choice is visible without opening the submenu.
+    /// A menu title with the current value shown in gray right after the label, so
+    /// the choice is visible without opening the submenu (FR-5). The value sits just
+    /// before the submenu arrow with compact, system-like spacing.
     private func menuTitle(_ label: String, value: String) -> NSAttributedString {
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.tabStops = [NSTextTab(textAlignment: .right, location: 150)]
-        let result = NSMutableAttributedString(string: label + "\t", attributes: [.paragraphStyle: paragraph])
+        let result = NSMutableAttributedString(string: label + "   ")
         result.append(NSAttributedString(
             string: value,
-            attributes: [.foregroundColor: NSColor.secondaryLabelColor, .paragraphStyle: paragraph]
+            attributes: [.foregroundColor: NSColor.secondaryLabelColor]
         ))
         return result
     }
 
-    /// The bottom parity block (FR-2): same names and actions as the system menu.
-    /// Items whose mechanism is unavailable on this macOS are hidden (degradation).
+    /// The bottom parity block (FR-2): same names, icons, and actions as the system
+    /// menu. Items whose mechanism is unavailable on this macOS are hidden.
     private func makeParityItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
-        items.append(makeActionItem("Show Emoji & Symbols", #selector(showEmojiSymbols)))
+        items.append(makeActionItem(
+            "Show Emoji & Symbols",
+            #selector(showEmojiSymbols),
+            icon: parityIcon(sourceID: characterPaletteID)
+        ))
         if manager.isSourceInstalled(id: keyboardViewerID) {
-            items.append(makeActionItem("Show Keyboard Viewer", #selector(showKeyboardViewer)))
+            items.append(makeActionItem(
+                "Show Keyboard Viewer",
+                #selector(showKeyboardViewer),
+                icon: parityIcon(sourceID: keyboardViewerID)
+            ))
         }
-        items.append(makeActionItem("Edit Text Substitutions…", #selector(editTextSubstitutions)))
         items.append(makeActionItem("Open Keyboard Settings…", #selector(openKeyboardSettings)))
 
         return items
     }
 
-    private func makeActionItem(_ title: String, _ action: Selector) -> NSMenuItem {
+    private func makeActionItem(_ title: String, _ action: Selector, icon: NSImage? = nil) -> NSMenuItem {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
         item.target = self
+        item.image = icon
         return item
+    }
+
+    /// The source's own macOS icon rendered as a small template glyph for the menu.
+    private func parityIcon(sourceID: String) -> NSImage? {
+        guard let icon = manager.icon(forSourceID: sourceID) else { return nil }
+        return FlagRenderer.icon(icon, height: FlagRenderer.menuHeight, template: true)
     }
 
     /// Move the checkmark to the active source without rebuilding the menu.

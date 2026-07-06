@@ -90,7 +90,11 @@ final class InputSourceManager {
             return []
         }
         return list
-            .filter { $0.category == kTISCategoryKeyboardInputSource as String && $0.isSelectable }
+            .filter {
+                $0.category == kTISCategoryKeyboardInputSource as String
+                    && $0.isSelectable
+                    && $0.isEnabled
+            }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
     }
 
@@ -127,6 +131,13 @@ final class InputSourceManager {
             return nil
         }
         return list.first { $0.id == id }
+    }
+
+    /// The system icon of an installed source (e.g. the Character Viewer palette),
+    /// used to give parity menu items their real macOS icon (FR-2).
+    func icon(forSourceID id: String) -> NSImage? {
+        guard let source = installedSource(id: id), let url = source.iconImageURL else { return nil }
+        return NSImage(contentsOf: url)
     }
 
     /// Build an `InputSource`; returns nil when a source lacks an id or name.
@@ -185,6 +196,7 @@ private extension TISInputSource {
     var name: String? { property(kTISPropertyLocalizedName, as: String.self) }
     var category: String? { property(kTISPropertyInputSourceCategory, as: String.self) }
     var isSelectable: Bool { property(kTISPropertyInputSourceIsSelectCapable, as: Bool.self) ?? false }
+    var isEnabled: Bool { property(kTISPropertyInputSourceIsEnabled, as: Bool.self) ?? false }
     var languages: [String] { property(kTISPropertyInputSourceLanguages, as: [String].self) ?? [] }
 
     /// URL of the source's icon (`kTISPropertyIconImageURL`), if the system provides one.
