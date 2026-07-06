@@ -34,13 +34,36 @@ final class StatusItemController: NSObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
 
-        // Never enlarge the flag to fill the button (which cropped tall/light flags);
-        // only shrink to fit, preserving aspect ratio.
-        statusItem.button?.imageScaling = .scaleProportionallyDown
+        if let button = statusItem.button {
+            // Never enlarge the flag to fill the button (which cropped tall/light
+            // flags); only shrink to fit, preserving aspect ratio.
+            button.imageScaling = .scaleProportionallyDown
+            // Handle the click ourselves so left-click opens the main menu and
+            // right-click opens the app menu (Quit), instead of a fixed menu.
+            button.target = self
+            button.action = #selector(statusItemClicked)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        }
 
         manager.delegate = self
-        rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
+    }
+
+    // MARK: - Click routing
+
+    @objc private func statusItemClicked() {
+        let event = NSApp.currentEvent
+        let wantsAppMenu = event?.type == .rightMouseUp
+            || (event?.modifierFlags.contains(.control) ?? false)
+        showMenu(wantsAppMenu ? buildAppMenu() : buildMainMenu())
+    }
+
+    /// Present a menu under the status item, then detach it so the next click routes
+    /// back through the button action (left/right detection).
+    private func showMenu(_ menu: NSMenu) {
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        statusItem.menu = nil
     }
 
     // MARK: - Actions
@@ -57,7 +80,6 @@ final class StatusItemController: NSObject {
         guard let raw = sender.representedObject as? String,
               let value = SettingsStore.FlagSetting(rawValue: raw) else { return }
         settings.flagSetting = value
-        rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
     }
 
@@ -66,7 +88,6 @@ final class StatusItemController: NSObject {
         guard let raw = sender.representedObject as? String,
               let value = SettingsStore.NameSetting(rawValue: raw) else { return }
         settings.nameSetting = value
-        rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
     }
 
@@ -81,16 +102,12 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func openKeyboardSettings() {
-        openSystemSettings(anchor: "com.apple.Keyboard-Settings.extension")
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     @objc private func quitClicked() {
         NSApplication.shared.terminate(nil)
-    }
-
-    private func openSystemSettings(anchor: String) {
-        guard let url = URL(string: "x-apple.systempreferences:\(anchor)") else { return }
-        NSWorkspace.shared.open(url)
     }
 
     // MARK: - Indicator (FR-4)
@@ -153,18 +170,21 @@ final class StatusItemController: NSObject {
         return text.prefix(head) + "…" + text.suffix(tail)
     }
 
-    // MARK: - Menu (FR-2, FR-5)
+    // MARK: - Menus (FR-2, FR-5)
 
-    /// Rebuild the whole menu: the app submenu ("…"), the input sources, and the
-    /// system-parity block. Menu rows always show flag + full name (FR-2).
-    private func rebuildMenu() {
+    /// The main (left-click) menu: input sources, then the Flag/Name settings, then
+    /// the system-parity block. Menu rows always show flag + full name (FR-2).
+    private func buildMainMenu() -> NSMenu {
         let menu = NSMenu()
-
-        menu.addItem(makeAppSubmenuItem())
-        menu.addItem(.separator())
-
+        let sources = manager.inputSources
         let menuMode = settings.menuFlagMode
-        for source in manager.inputSources {
+        let hasKeyboardViewer = manager.isSourceInstalled(id: keyboardViewerID)
+
+        // Right edge for the Flag/Name value, aligned near the submenu arrow like the
+        // system menus, computed from the widest item so it hugs the menu's edge.
+        let valueEdge = valueRightEdge(sources: sources, hasKeyboardViewer: hasKeyboardViewer)
+
+        for source in sources {
             let item = NSMenuItem(
                 title: source.name,
                 action: #selector(inputSourceItemClicked(_:)),
@@ -179,35 +199,39 @@ final class StatusItemController: NSObject {
         }
 
         menu.addItem(.separator())
-        menu.addItem(makeFlagSettingItem())
-        menu.addItem(makeNameSettingItem())
+        menu.addItem(makeFlagSettingItem(valueEdge: valueEdge))
+        menu.addItem(makeNameSettingItem(valueEdge: valueEdge))
 
         menu.addItem(.separator())
-        for item in makeParityItems() {
-            menu.addItem(item)
+        menu.addItem(makeActionItem(
+            "Show Emoji & Symbols",
+            #selector(showEmojiSymbols),
+            icon: parityIcon(sourceID: characterPaletteID)
+        ))
+        if hasKeyboardViewer {
+            menu.addItem(makeActionItem(
+                "Show Keyboard Viewer",
+                #selector(showKeyboardViewer),
+                icon: parityIcon(sourceID: keyboardViewerID)
+            ))
         }
+        menu.addItem(.separator())
+        menu.addItem(makeActionItem("Open Keyboard Settings…", #selector(openKeyboardSettings)))
 
-        statusItem.menu = menu
+        return menu
     }
 
-    /// The "…" app submenu (FR-5). For now it holds only Quit; the Settings window
-    /// entry is added in Phase 4b once the window exists.
-    private func makeAppSubmenuItem() -> NSMenuItem {
-        let submenu = NSMenu()
+    /// The app (right-click) menu: application-level items. For now only Quit; the
+    /// Settings window entry is added in Phase 4b.
+    private func buildAppMenu() -> NSMenu {
+        let menu = NSMenu()
         let quitItem = NSMenuItem(title: "Quit Flang", action: #selector(quitClicked), keyEquivalent: "q")
         quitItem.target = self
-        submenu.addItem(quitItem)
-
-        let parent = NSMenuItem()
-        parent.attributedTitle = NSAttributedString(
-            string: "…",
-            attributes: [.foregroundColor: NSColor.secondaryLabelColor]
-        )
-        parent.submenu = submenu
-        return parent
+        menu.addItem(quitItem)
+        return menu
     }
 
-    private func makeFlagSettingItem() -> NSMenuItem {
+    private func makeFlagSettingItem(valueEdge: CGFloat) -> NSMenuItem {
         let options: [(value: SettingsStore.FlagSetting, title: String)] = [
             (.image, "Image"),
             (.emoji, "Emoji"),
@@ -223,12 +247,12 @@ final class StatusItemController: NSObject {
             submenu.addItem(item)
         }
         let parent = NSMenuItem()
-        parent.attributedTitle = menuTitle("Flag", value: current)
+        parent.attributedTitle = menuTitle("Flag", value: current, valueEdge: valueEdge)
         parent.submenu = submenu
         return parent
     }
 
-    private func makeNameSettingItem() -> NSMenuItem {
+    private func makeNameSettingItem(valueEdge: CGFloat) -> NSMenuItem {
         let options: [(value: SettingsStore.NameSetting, title: String)] = [
             (.short, "Short"),
             (.full, "Full"),
@@ -244,43 +268,42 @@ final class StatusItemController: NSObject {
             submenu.addItem(item)
         }
         let parent = NSMenuItem()
-        parent.attributedTitle = menuTitle("Name", value: current)
+        parent.attributedTitle = menuTitle("Name", value: current, valueEdge: valueEdge)
         parent.submenu = submenu
         return parent
     }
 
-    /// A menu title with the current value shown in gray right after the label, so
-    /// the choice is visible without opening the submenu (FR-5). The value sits just
-    /// before the submenu arrow with compact, system-like spacing.
-    private func menuTitle(_ label: String, value: String) -> NSAttributedString {
-        let result = NSMutableAttributedString(string: label + "   ")
+    /// A menu title with the current value right-aligned in gray, just before the
+    /// submenu arrow, matching how system menus show a chosen value (FR-5).
+    private func menuTitle(_ label: String, value: String, valueEdge: CGFloat) -> NSAttributedString {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.tabStops = [NSTextTab(textAlignment: .right, location: valueEdge)]
+        let result = NSMutableAttributedString(string: label + "\t", attributes: [.paragraphStyle: paragraph])
         result.append(NSAttributedString(
             string: value,
-            attributes: [.foregroundColor: NSColor.secondaryLabelColor]
+            attributes: [.foregroundColor: NSColor.secondaryLabelColor, .paragraphStyle: paragraph]
         ))
         return result
     }
 
-    /// The bottom parity block (FR-2): same names, icons, and actions as the system
-    /// menu. Items whose mechanism is unavailable on this macOS are hidden.
-    private func makeParityItems() -> [NSMenuItem] {
-        var items: [NSMenuItem] = []
-
-        items.append(makeActionItem(
-            "Show Emoji & Symbols",
-            #selector(showEmojiSymbols),
-            icon: parityIcon(sourceID: characterPaletteID)
-        ))
-        if manager.isSourceInstalled(id: keyboardViewerID) {
-            items.append(makeActionItem(
-                "Show Keyboard Viewer",
-                #selector(showKeyboardViewer),
-                icon: parityIcon(sourceID: keyboardViewerID)
-            ))
+    /// Width at which the Flag/Name value is right-aligned: the widest menu row's
+    /// text extent, so the value sits at the menu's right edge near the arrow.
+    private func valueRightEdge(sources: [InputSource], hasKeyboardViewer: Bool) -> CGFloat {
+        let font = NSFont.menuFont(ofSize: 0)
+        func width(_ text: String) -> CGFloat {
+            (text as NSString).size(withAttributes: [.font: font]).width
         }
-        items.append(makeActionItem("Open Keyboard Settings…", #selector(openKeyboardSettings)))
-
-        return items
+        // Rows that carry a leading icon reserve room for it before their text.
+        let iconIndent: CGFloat = 22
+        var edge: CGFloat = width("Show Emoji & Symbols") + iconIndent
+        edge = max(edge, width("Open Keyboard Settings…") + iconIndent)
+        if hasKeyboardViewer {
+            edge = max(edge, width("Show Keyboard Viewer") + iconIndent)
+        }
+        for source in sources {
+            edge = max(edge, width(source.name) + iconIndent)
+        }
+        return edge
     }
 
     private func makeActionItem(_ title: String, _ action: Selector, icon: NSImage? = nil) -> NSMenuItem {
@@ -290,19 +313,19 @@ final class StatusItemController: NSObject {
         return item
     }
 
-    /// The source's own macOS icon rendered as a small template glyph for the menu.
+    /// The source's own macOS icon as a small template glyph, keeping its aspect
+    /// ratio (the palette icon is 16x14, so it must not be squished into a square).
     private func parityIcon(sourceID: String) -> NSImage? {
         guard let icon = manager.icon(forSourceID: sourceID) else { return nil }
-        return FlagRenderer.icon(icon, height: FlagRenderer.menuHeight, template: true)
-    }
-
-    /// Move the checkmark to the active source without rebuilding the menu.
-    private func updateMenuSelection(currentID: String?) {
-        guard let menu = statusItem.menu else { return }
-        for item in menu.items {
-            guard let id = item.representedObject as? String else { continue }
-            item.state = (id == currentID) ? .on : .off
-        }
+        let maxHeight = FlagRenderer.menuHeight
+        let scale = min(1, maxHeight / max(1, icon.size.height))
+        let size = NSSize(width: (icon.size.width * scale).rounded(), height: (icon.size.height * scale).rounded())
+        let output = NSImage(size: size)
+        output.lockFocus()
+        icon.draw(in: NSRect(origin: .zero, size: size))
+        output.unlockFocus()
+        output.isTemplate = true
+        return output
     }
 }
 
@@ -310,14 +333,12 @@ final class StatusItemController: NSObject {
 
 extension StatusItemController: InputSourceMonitoring {
     func selectedInputSourceDidChange() {
-        // Read the current source once and reuse it for both UI updates.
-        let current = manager.currentInputSource
-        updateIndicator(for: current)
-        updateMenuSelection(currentID: current?.id)
+        updateIndicator(for: manager.currentInputSource)
     }
 
     func enabledInputSourcesDidChange() {
-        rebuildMenu()
+        // The menu is built on demand at click time, so only the indicator needs
+        // refreshing here.
         updateIndicator(for: manager.currentInputSource)
     }
 }
