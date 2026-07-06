@@ -293,8 +293,9 @@ final class StatusItemController: NSObject {
         func width(_ text: String) -> CGFloat {
             (text as NSString).size(withAttributes: [.font: font]).width
         }
-        // Rows that carry a leading icon reserve room for it before their text.
-        let iconIndent: CGFloat = 22
+        // Approximate leading room (state column + icon) so the value right-aligns
+        // near the submenu arrow at the menu's natural width.
+        let iconIndent: CGFloat = 34
         var edge: CGFloat = width("Show Emoji & Symbols") + iconIndent
         edge = max(edge, width("Open Keyboard Settings…") + iconIndent)
         if hasKeyboardViewer {
