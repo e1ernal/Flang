@@ -68,7 +68,7 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Switch input sources from the dropdown menu
 - [x] Default flag map for all macOS layouts and input methods
 - [x] Image and emoji flag modes
-- [ ] Six display styles
+- [x] Six display styles
 - [ ] Settings window: custom flag, short and full name per language
 - [ ] Start at login, first-launch tips
 - [ ] Localized interface and README (EN, ES, FR, JA, PT-BR, ZH-Hans, RU)
