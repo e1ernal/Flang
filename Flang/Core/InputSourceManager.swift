@@ -106,6 +106,29 @@ final class InputSourceManager {
         }
     }
 
+    /// Whether an input source with this id is installed. Used to hide menu items
+    /// whose system mechanism is unavailable (FR-2 degradation rule).
+    func isSourceInstalled(id: String) -> Bool {
+        installedSource(id: id) != nil
+    }
+
+    /// Activate an installed source by id — used for palette sources like the
+    /// Keyboard Viewer (`com.apple.KeyboardViewer`), which aren't in the enabled list.
+    func activateSource(id: String) {
+        guard let source = installedSource(id: id) else { return }
+        let status = TISSelectInputSource(source)
+        if status != noErr {
+            logger.error("Failed to activate source \(id, privacy: .public): OSStatus \(status)")
+        }
+    }
+
+    private func installedSource(id: String) -> TISInputSource? {
+        guard let list = TISCreateInputSourceList(nil, true)?.takeRetainedValue() as? [TISInputSource] else {
+            return nil
+        }
+        return list.first { $0.id == id }
+    }
+
     /// Build an `InputSource`; returns nil when a source lacks an id or name.
     private func makeInputSource(from source: TISInputSource, currentID: String?) -> InputSource? {
         guard let id = source.id, let name = source.name else { return nil }

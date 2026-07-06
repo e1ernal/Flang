@@ -15,8 +15,11 @@ final class StatusItemController: NSObject {
     private let flagStore = FlagStore()
     private let settings = SettingsStore()
 
+    /// Palette input source that opens the Keyboard Viewer window.
+    private let keyboardViewerID = "com.apple.KeyboardViewer"
+
     /// Longest full-name text shown in the indicator before it is ellipsized
-    /// (SPEC section 5: styles 4/6 cap the indicator width).
+    /// (SPEC section 5: cap the indicator width).
     private let maxIndicatorTitleLength = 16
 
     /// Flag height for the menu bar indicator: the bar's icon area, so the image
@@ -49,62 +52,83 @@ final class StatusItemController: NSObject {
     }
 
     @objc
-    private func indicatorStyleChanged(_ sender: NSMenuItem) {
+    private func flagSettingChanged(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String,
-              let style = SettingsStore.IndicatorStyle(rawValue: raw) else { return }
-        settings.indicatorStyle = style
+              let value = SettingsStore.FlagSetting(rawValue: raw) else { return }
+        settings.flagSetting = value
         rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
     }
 
     @objc
-    private func flagModeChanged(_ sender: NSMenuItem) {
+    private func nameSettingChanged(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String,
-              let mode = FlagStore.Mode(rawValue: raw) else { return }
-        settings.flagMode = mode
+              let value = SettingsStore.NameSetting(rawValue: raw) else { return }
+        settings.nameSetting = value
         rebuildMenu()
         updateIndicator(for: manager.currentInputSource)
     }
 
-    @objc
-    private func quitClicked() {
+    @objc private func showEmojiSymbols() {
+        NSApp.orderFrontCharacterPalette(nil)
+    }
+
+    @objc private func showKeyboardViewer() {
+        manager.activateSource(id: keyboardViewerID)
+    }
+
+    @objc private func editTextSubstitutions() {
+        // Deep link to Text Replacements; System Settings falls back to the Keyboard
+        // pane when the anchor is unknown on this macOS (FR-2 degradation).
+        openSystemSettings(anchor: "com.apple.Keyboard-Settings.extension?TextReplacement")
+    }
+
+    @objc private func openKeyboardSettings() {
+        openSystemSettings(anchor: "com.apple.Keyboard-Settings.extension")
+    }
+
+    @objc private func quitClicked() {
         NSApplication.shared.terminate(nil)
     }
 
-    // MARK: - UI updates
+    private func openSystemSettings(anchor: String) {
+        guard let url = URL(string: "x-apple.systempreferences:\(anchor)") else { return }
+        NSWorkspace.shared.open(url)
+    }
 
-    /// Refresh the menu bar indicator for the active source in the selected style
-    /// (FR-4). Leaves the indicator untouched when the source can't be read (`nil`).
+    // MARK: - Indicator (FR-4)
+
+    /// Refresh the menu bar indicator for the active source, composed from the flag
+    /// and name settings (FR-4). Leaves it untouched when the source can't be read.
     private func updateIndicator(for source: InputSource?) {
-        guard let button = statusItem.button else { return }
-        guard let source else { return }
+        guard let button = statusItem.button, let source else { return }
+        let flag = flagImage(for: source)
+        let name = nameText(for: source)
 
-        let mode = settings.flagMode
-        button.image = nil
-        button.title = ""
+        if flag == nil && name == nil {
+            // "None" + "None": show the source's system icon ("like Apple"); the
+            // indicator is never empty. If there is no icon, fall back to the
+            // abbreviation, which is what macOS itself shows.
+            let icon = flagStore.systemIcon(for: source, height: indicatorHeight)
+            setIndicator(button, image: icon, title: icon == nil ? source.shortName : nil, source: source)
+        } else {
+            setIndicator(button, image: flag, title: name, source: source)
+        }
+    }
 
-        switch settings.indicatorStyle {
-        case .system:
-            if let icon = flagStore.systemIcon(for: source, height: indicatorHeight) {
-                setIndicator(button, image: icon, title: nil, source: source)
-            } else {
-                // No system icon (most keyboard layouts): the abbreviation is the
-                // closest match to what macOS shows.
-                setIndicator(button, image: nil, title: source.shortName, source: source)
-            }
-        case .flag:
-            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
-            setIndicator(button, image: flag, title: nil, source: source)
-        case .flagShort:
-            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
-            setIndicator(button, image: flag, title: source.shortName, source: source)
-        case .flagFull:
-            let flag = flagStore.image(for: source, mode: mode, height: indicatorHeight)
-            setIndicator(button, image: flag, title: truncated(source.name), source: source)
-        case .short:
-            setIndicator(button, image: nil, title: source.shortName, source: source)
-        case .full:
-            setIndicator(button, image: nil, title: truncated(source.name), source: source)
+    private func flagImage(for source: InputSource) -> NSImage? {
+        switch settings.flagSetting {
+        case .image: return flagStore.image(for: source, mode: .images, height: indicatorHeight)
+        case .emoji: return flagStore.image(for: source, mode: .emoji, height: indicatorHeight)
+        case .none: return nil
+        }
+    }
+
+    private func nameText(for source: InputSource) -> String? {
+        switch settings.nameSetting {
+        case .short: return source.shortName
+        case .full: return truncated(source.name)
+        case .none: return nil
         }
     }
 
@@ -112,8 +136,7 @@ final class StatusItemController: NSObject {
         image?.accessibilityDescription = source.name
         button.image = image
         button.title = title ?? ""
-        // The full name is always reachable on hover, even when the indicator shows
-        // only a flag, an abbreviation, or a truncated name (SPEC section 5).
+        // The full name is always reachable on hover (SPEC section 5).
         button.toolTip = source.name
         if image != nil && title != nil {
             button.imagePosition = .imageLeading
@@ -124,8 +147,7 @@ final class StatusItemController: NSObject {
         }
     }
 
-    /// Truncate long text with a middle ellipsis (SPEC section 5: "посередине"),
-    /// keeping the start and end of the name recognizable.
+    /// Truncate long text with a middle ellipsis (SPEC section 5: "посередине").
     private func truncated(_ text: String) -> String {
         guard text.count > maxIndicatorTitleLength else { return text }
         let kept = maxIndicatorTitleLength - 1
@@ -134,11 +156,17 @@ final class StatusItemController: NSObject {
         return text.prefix(head) + "…" + text.suffix(tail)
     }
 
-    /// Rebuild the whole menu. Menu items always show flag + full name regardless
-    /// of the indicator style (FR-2).
+    // MARK: - Menu (FR-2, FR-5)
+
+    /// Rebuild the whole menu: the app submenu ("…"), the input sources, and the
+    /// system-parity block. Menu rows always show flag + full name (FR-2).
     private func rebuildMenu() {
         let menu = NSMenu()
 
+        menu.addItem(makeAppSubmenuItem())
+        menu.addItem(.separator())
+
+        let menuMode = settings.menuFlagMode
         for source in manager.inputSources {
             let item = NSMenuItem(
                 title: source.name,
@@ -146,7 +174,7 @@ final class StatusItemController: NSObject {
                 keyEquivalent: ""
             )
             item.target = self
-            item.image = flagStore.image(for: source, mode: settings.flagMode, height: FlagRenderer.menuHeight)
+            item.image = flagStore.image(for: source, mode: menuMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
             item.toolTip = source.name
@@ -154,69 +182,108 @@ final class StatusItemController: NSObject {
         }
 
         menu.addItem(.separator())
-        menu.addItem(makeIndicatorStyleItem())
-        menu.addItem(makeFlagModeItem())
-        menu.addItem(.separator())
-
-        let quitItem = NSMenuItem(
-            title: "Quit Flang",
-            action: #selector(quitClicked),
-            keyEquivalent: "q"
-        )
-        quitItem.target = self
-        menu.addItem(quitItem)
+        for item in makeParityItems() {
+            menu.addItem(item)
+        }
 
         statusItem.menu = menu
     }
 
-    /// Temporary indicator-style switcher; moves into the Settings window in Phase 4.
-    private func makeIndicatorStyleItem() -> NSMenuItem {
-        let options: [(style: SettingsStore.IndicatorStyle, title: String)] = [
-            (.system, "System"),
-            (.flag, "Flag"),
-            (.flagShort, "Flag + short name"),
-            (.flagFull, "Flag + full name"),
-            (.short, "Short name"),
-            (.full, "Full name")
-        ]
+    /// The "…" app submenu (FR-5): flag and name settings, then Quit. The Settings
+    /// window entry is added in Phase 4b once the window exists.
+    private func makeAppSubmenuItem() -> NSMenuItem {
         let submenu = NSMenu()
-        for option in options {
-            let item = NSMenuItem(
-                title: option.title,
-                action: #selector(indicatorStyleChanged(_:)),
-                keyEquivalent: ""
-            )
-            item.target = self
-            item.representedObject = option.style.rawValue
-            item.state = (option.style == settings.indicatorStyle) ? .on : .off
-            submenu.addItem(item)
-        }
-        let parent = NSMenuItem(title: "Indicator Style (temporary)", action: nil, keyEquivalent: "")
+        submenu.addItem(makeFlagSettingItem())
+        submenu.addItem(makeNameSettingItem())
+        submenu.addItem(.separator())
+
+        let quitItem = NSMenuItem(title: "Quit Flang", action: #selector(quitClicked), keyEquivalent: "q")
+        quitItem.target = self
+        submenu.addItem(quitItem)
+
+        let parent = NSMenuItem()
+        parent.attributedTitle = NSAttributedString(
+            string: "…",
+            attributes: [.foregroundColor: NSColor.secondaryLabelColor]
+        )
         parent.submenu = submenu
         return parent
     }
 
-    /// Temporary flag-mode switcher; moves into the Settings window in Phase 4.
-    private func makeFlagModeItem() -> NSMenuItem {
-        let options: [(mode: FlagStore.Mode, title: String)] = [
-            (.images, "Images"),
-            (.emoji, "Emoji")
+    private func makeFlagSettingItem() -> NSMenuItem {
+        let options: [(value: SettingsStore.FlagSetting, title: String)] = [
+            (.image, "Image"),
+            (.emoji, "Emoji"),
+            (.none, "None")
         ]
+        let current = options.first { $0.value == settings.flagSetting }?.title ?? ""
         let submenu = NSMenu()
         for option in options {
-            let item = NSMenuItem(
-                title: option.title,
-                action: #selector(flagModeChanged(_:)),
-                keyEquivalent: ""
-            )
+            let item = NSMenuItem(title: option.title, action: #selector(flagSettingChanged(_:)), keyEquivalent: "")
             item.target = self
-            item.representedObject = option.mode.rawValue
-            item.state = (option.mode == settings.flagMode) ? .on : .off
+            item.representedObject = option.value.rawValue
+            item.state = (option.value == settings.flagSetting) ? .on : .off
             submenu.addItem(item)
         }
-        let parent = NSMenuItem(title: "Flag Mode (temporary)", action: nil, keyEquivalent: "")
+        let parent = NSMenuItem()
+        parent.attributedTitle = menuTitle("Flag", value: current)
         parent.submenu = submenu
         return parent
+    }
+
+    private func makeNameSettingItem() -> NSMenuItem {
+        let options: [(value: SettingsStore.NameSetting, title: String)] = [
+            (.short, "Short"),
+            (.full, "Full"),
+            (.none, "None")
+        ]
+        let current = options.first { $0.value == settings.nameSetting }?.title ?? ""
+        let submenu = NSMenu()
+        for option in options {
+            let item = NSMenuItem(title: option.title, action: #selector(nameSettingChanged(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = option.value.rawValue
+            item.state = (option.value == settings.nameSetting) ? .on : .off
+            submenu.addItem(item)
+        }
+        let parent = NSMenuItem()
+        parent.attributedTitle = menuTitle("Name", value: current)
+        parent.submenu = submenu
+        return parent
+    }
+
+    /// A menu title with the current value right-aligned in gray, like system menus
+    /// (FR-5), so the choice is visible without opening the submenu.
+    private func menuTitle(_ label: String, value: String) -> NSAttributedString {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.tabStops = [NSTextTab(textAlignment: .right, location: 150)]
+        let result = NSMutableAttributedString(string: label + "\t", attributes: [.paragraphStyle: paragraph])
+        result.append(NSAttributedString(
+            string: value,
+            attributes: [.foregroundColor: NSColor.secondaryLabelColor, .paragraphStyle: paragraph]
+        ))
+        return result
+    }
+
+    /// The bottom parity block (FR-2): same names and actions as the system menu.
+    /// Items whose mechanism is unavailable on this macOS are hidden (degradation).
+    private func makeParityItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = []
+
+        items.append(makeActionItem("Show Emoji & Symbols", #selector(showEmojiSymbols)))
+        if manager.isSourceInstalled(id: keyboardViewerID) {
+            items.append(makeActionItem("Show Keyboard Viewer", #selector(showKeyboardViewer)))
+        }
+        items.append(makeActionItem("Edit Text Substitutions…", #selector(editTextSubstitutions)))
+        items.append(makeActionItem("Open Keyboard Settings…", #selector(openKeyboardSettings)))
+
+        return items
+    }
+
+    private func makeActionItem(_ title: String, _ action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.target = self
+        return item
     }
 
     /// Move the checkmark to the active source without rebuilding the menu.
