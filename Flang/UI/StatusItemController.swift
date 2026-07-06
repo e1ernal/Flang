@@ -112,6 +112,9 @@ final class StatusItemController: NSObject {
         image?.accessibilityDescription = source.name
         button.image = image
         button.title = title ?? ""
+        // The full name is always reachable on hover, even when the indicator shows
+        // only a flag, an abbreviation, or a truncated name (SPEC section 5).
+        button.toolTip = source.name
         if image != nil && title != nil {
             button.imagePosition = .imageLeading
         } else if image != nil {
@@ -121,10 +124,14 @@ final class StatusItemController: NSObject {
         }
     }
 
-    /// Truncate long text with a middle-less tail ellipsis for the indicator.
+    /// Truncate long text with a middle ellipsis (SPEC section 5: "посередине"),
+    /// keeping the start and end of the name recognizable.
     private func truncated(_ text: String) -> String {
         guard text.count > maxIndicatorTitleLength else { return text }
-        return String(text.prefix(maxIndicatorTitleLength - 1)) + "…"
+        let kept = maxIndicatorTitleLength - 1
+        let head = kept - kept / 2
+        let tail = kept / 2
+        return text.prefix(head) + "…" + text.suffix(tail)
     }
 
     /// Rebuild the whole menu. Menu items always show flag + full name regardless

@@ -67,19 +67,24 @@ final class FlagStore {
     /// and draw it as a template so a monochrome glyph stays visible on any theme.
     /// If there is no icon, use the globe.
     private func fallbackImage(for source: InputSource, height: CGFloat) -> NSImage {
-        if let icon = systemIcon(for: source, height: height) {
-            return icon
+        // Fallback path (FR-3): draw as a template so a monochrome glyph (e.g. Ainu)
+        // stays visible on a dark menu bar.
+        if let icon = loadSystemIcon(for: source) {
+            return FlagRenderer.icon(icon, height: height, template: true)
         }
         return FlagRenderer.globe(height: height)
     }
 
-    /// The source's own macOS icon rendered for the menu bar, or nil if it has none.
-    /// Used by the "System" indicator style (FR-4) and the fallback path (FR-3).
+    /// The source's own macOS icon rendered in color for the "System" style (FR-4,
+    /// "like Apple"), or nil if it has none.
     func systemIcon(for source: InputSource, height: CGFloat) -> NSImage? {
-        guard let url = source.systemIconURL, let icon = NSImage(contentsOf: url) else {
-            return nil
-        }
-        return FlagRenderer.icon(icon, height: height)
+        guard let icon = loadSystemIcon(for: source) else { return nil }
+        return FlagRenderer.icon(icon, height: height, template: false)
+    }
+
+    private func loadSystemIcon(for source: InputSource) -> NSImage? {
+        guard let url = source.systemIconURL else { return nil }
+        return NSImage(contentsOf: url)
     }
 
     /// Convert a two-letter country code into its emoji flag via regional indicators.
@@ -154,15 +159,16 @@ enum FlagRenderer {
         return output
     }
 
-    /// The source's own system icon, scaled to height and drawn as a template so a
-    /// monochrome glyph adapts to a light or dark menu bar (instead of a black blob).
-    static func icon(_ icon: NSImage, height: CGFloat) -> NSImage {
+    /// The source's own system icon, scaled to height. Draw as a template for the
+    /// fallback path (a monochrome glyph then adapts to the theme instead of a black
+    /// blob); draw in color for the "System" style to match how macOS shows it.
+    static func icon(_ icon: NSImage, height: CGFloat, template: Bool) -> NSImage {
         let size = NSSize(width: height, height: height)
         let output = NSImage(size: size)
         output.lockFocus()
         defer { output.unlockFocus() }
         icon.draw(in: NSRect(origin: .zero, size: size))
-        output.isTemplate = true
+        output.isTemplate = template
         return output
     }
 
