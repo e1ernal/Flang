@@ -89,17 +89,30 @@ final class InputSourceManager {
         guard let list = TISCreateInputSourceList(nil, false)?.takeRetainedValue() as? [TISInputSource] else {
             return []
         }
-        var seenNames = Set<String>()
-        return list
+        let all = list
             .filter {
                 $0.category == kTISCategoryKeyboardInputSource as String
                     && $0.isSelectable
                     && $0.isEnabled
             }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
-            // Collapse sources that share a localized name (e.g. two Japanese input
-            // methods both shown as "Hiragana") into one entry.
-            .filter { seenNames.insert($0.name).inserted }
+
+        // Collapse sources that share a localized name (e.g. two Japanese input
+        // methods both shown as "Hiragana") into one entry, in system order. Prefer
+        // the selected variant so the active source keeps its checkmark.
+        var order: [String] = []
+        var byName: [String: InputSource] = [:]
+        for source in all {
+            if let existing = byName[source.name] {
+                if source.isSelected && !existing.isSelected {
+                    byName[source.name] = source
+                }
+            } else {
+                byName[source.name] = source
+                order.append(source.name)
+            }
+        }
+        return order.compactMap { byName[$0] }
     }
 
     /// Switch the system to the input source with the given Source ID. No-op if not found.
