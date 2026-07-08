@@ -89,9 +89,30 @@ final class InputSourceManager {
         guard let list = TISCreateInputSourceList(nil, false)?.takeRetainedValue() as? [TISInputSource] else {
             return []
         }
-        return list
-            .filter { $0.category == kTISCategoryKeyboardInputSource as String && $0.isSelectable }
+        let all = list
+            .filter {
+                $0.category == kTISCategoryKeyboardInputSource as String
+                    && $0.isSelectable
+                    && $0.isEnabled
+            }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
+
+        // Collapse sources that share a localized name (e.g. two Japanese input
+        // methods both shown as "Hiragana") into one entry, in system order. Prefer
+        // the selected variant so the active source keeps its checkmark.
+        var order: [String] = []
+        var byName: [String: InputSource] = [:]
+        for source in all {
+            if let existing = byName[source.name] {
+                if source.isSelected && !existing.isSelected {
+                    byName[source.name] = source
+                }
+            } else {
+                byName[source.name] = source
+                order.append(source.name)
+            }
+        }
+        return order.compactMap { byName[$0] }
     }
 
     /// Switch the system to the input source with the given Source ID. No-op if not found.
@@ -104,6 +125,40 @@ final class InputSourceManager {
         if status != noErr {
             logger.error("Failed to switch to input source \(id, privacy: .public): OSStatus \(status)")
         }
+    }
+
+    /// Whether an enabled input source with this id exists. Used to hide menu items
+    /// whose system mechanism is unavailable (FR-2 degradation rule).
+    func isSourceEnabled(id: String) -> Bool {
+        enabledSource(id: id) != nil
+    }
+
+    /// Activate an enabled source by id — used for palette sources like the Character
+    /// Viewer (`com.apple.CharacterPaletteIM`).
+    func activateSource(id: String) {
+        guard let source = enabledSource(id: id) else { return }
+        let status = TISSelectInputSource(source)
+        if status != noErr {
+            logger.error("Failed to activate source \(id, privacy: .public): OSStatus \(status)")
+        }
+    }
+
+    /// Look up a source among the *enabled* ones. We must not use
+    /// `TISCreateInputSourceList(nil, true)` (all installed): that call has a nasty
+    /// side effect of re-enabling every installed source, which made removed
+    /// layouts reappear in the menu.
+    private func enabledSource(id: String) -> TISInputSource? {
+        guard let list = TISCreateInputSourceList(nil, false)?.takeRetainedValue() as? [TISInputSource] else {
+            return nil
+        }
+        return list.first { $0.id == id }
+    }
+
+    /// The system icon of an enabled source (e.g. the Character Viewer palette),
+    /// used to give parity menu items their real macOS icon (FR-2).
+    func icon(forSourceID id: String) -> NSImage? {
+        guard let source = enabledSource(id: id), let url = source.iconImageURL else { return nil }
+        return NSImage(contentsOf: url)
     }
 
     /// Build an `InputSource`; returns nil when a source lacks an id or name.
@@ -162,6 +217,7 @@ private extension TISInputSource {
     var name: String? { property(kTISPropertyLocalizedName, as: String.self) }
     var category: String? { property(kTISPropertyInputSourceCategory, as: String.self) }
     var isSelectable: Bool { property(kTISPropertyInputSourceIsSelectCapable, as: Bool.self) ?? false }
+    var isEnabled: Bool { property(kTISPropertyInputSourceIsEnabled, as: Bool.self) ?? false }
     var languages: [String] { property(kTISPropertyInputSourceLanguages, as: [String].self) ?? [] }
 
     /// URL of the source's icon (`kTISPropertyIconImageURL`), if the system provides one.

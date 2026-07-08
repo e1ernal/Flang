@@ -7,36 +7,46 @@
 
 import Foundation
 
-/// Persists user preferences in `UserDefaults` (SPEC 8). For now: indicator style
-/// and flag display mode; personalization (FR-7) is added in Phase 4.
+/// Persists user preferences in `UserDefaults` (SPEC 8). The indicator is composed
+/// from two independent settings (FR-4): a flag part and a name part.
 final class SettingsStore {
-    /// The six menu-bar indicator styles (FR-4). Raw values are the storage keys.
-    enum IndicatorStyle: String, CaseIterable {
-        case system
-        case flag
-        case flagShort
-        case flagFull
+    /// Flag part of the indicator (FR-4). "none" hides the flag.
+    enum FlagSetting: String, CaseIterable {
+        case image
+        case emoji
+        case none
+    }
+
+    /// Name part of the indicator (FR-4). "none" hides the name.
+    enum NameSetting: String, CaseIterable {
         case short
         case full
+        case none
     }
 
     private let defaults: UserDefaults
-    private let styleKey = "IndicatorStyle"
-    private let flagModeKey = "FlagMode"
+    private let flagKey = "FlagSetting"
+    private let nameKey = "NameSetting"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
 
-    /// Menu-bar indicator style; defaults to "flag" (SPEC FR-4).
-    var indicatorStyle: IndicatorStyle {
-        get { defaults.string(forKey: styleKey).flatMap(IndicatorStyle.init) ?? .flag }
-        set { defaults.set(newValue.rawValue, forKey: styleKey) }
+    /// How the flag is shown in the indicator; defaults to a picture flag (FR-4).
+    var flagSetting: FlagSetting {
+        get { defaults.string(forKey: flagKey).flatMap(FlagSetting.init) ?? .image }
+        set { defaults.set(newValue.rawValue, forKey: flagKey) }
     }
 
-    /// Whether flags are shown as pictures or emoji; defaults to pictures (FR-5).
-    var flagMode: FlagStore.Mode {
-        get { defaults.string(forKey: flagModeKey).flatMap(FlagStore.Mode.init) ?? .images }
-        set { defaults.set(newValue.rawValue, forKey: flagModeKey) }
+    /// How the source name is shown in the indicator; defaults to hidden (FR-4).
+    var nameSetting: NameSetting {
+        get { defaults.string(forKey: nameKey).flatMap(NameSetting.init) ?? .none }
+        set { defaults.set(newValue.rawValue, forKey: nameKey) }
+    }
+
+    /// The flag render mode for the menu rows, which always show a flag: emoji when
+    /// the flag setting is emoji, otherwise pictures (FR-2).
+    var menuFlagMode: FlagStore.Mode {
+        flagSetting == .emoji ? .emoji : .images
     }
 }
