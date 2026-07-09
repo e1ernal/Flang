@@ -80,10 +80,7 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func showEmojiSymbols() {
-        // TISSelectInputSource for CharacterPaletteIM returns 0 but silently does
-        // nothing for an agent app. Opening CharacterPalette.app directly works.
-        let url = URL(fileURLWithPath: "/System/Library/Input Methods/CharacterPalette.app")
-        NSWorkspace.shared.open(url)
+        NSApp.orderFrontCharacterPalette(self)
     }
 
     @objc private func showKeyboardViewer() {
