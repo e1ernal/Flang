@@ -19,8 +19,9 @@ private final class WelcomeWindow: NSWindow {
 final class FirstLaunchWindowController {
     private var window: NSWindow?
 
-    func showWindow() {
+    func showWindow(onGetStarted: @escaping () -> Void) {
         let view = FirstLaunchView { [weak self] in
+            onGetStarted()
             self?.window?.close()
         }
         let hostingView = NSHostingView(rootView: view)
@@ -159,7 +160,7 @@ struct FirstLaunchView: View {
             Text("Your flag + short name, right where the old indicator was")
                 .font(.system(size: 11))
                 .foregroundStyle(captionColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 

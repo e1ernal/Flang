@@ -33,9 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if !settings.hasLaunchedBefore {
             settings.launchAtLogin = true
-            settings.markAsLaunched()
             firstLaunchWindowController = FirstLaunchWindowController()
-            firstLaunchWindowController?.showWindow()
+            // Only mark the first launch as done once the user taps "Get Started",
+            // so closing or quitting beforehand keeps the welcome coming back.
+            firstLaunchWindowController?.showWindow { [weak self] in
+                self?.settings.markAsLaunched()
+            }
         }
     }
 }
