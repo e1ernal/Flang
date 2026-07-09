@@ -71,27 +71,33 @@ struct FirstLaunchView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .frame(width: 64, height: 64)
-                .padding(.bottom, 16)
+            VStack(spacing: 0) {
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .frame(width: 64, height: 64)
+                    .padding(.bottom, 16)
 
-            Text("Welcome to Flang")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(titleColor)
-                .padding(.bottom, 6)
+                Text("Welcome to Flang")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(titleColor)
+                    .padding(.bottom, 6)
 
-            Text("Country flags are back in your menu bar.")
-                .font(.system(size: 13))
-                .foregroundStyle(subtitleColor)
-                .padding(.bottom, 20)
+                Text("Country flags are back in your menu bar.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(subtitleColor)
+                    .padding(.bottom, 20)
 
-            menuBarPreview
-                .padding(.bottom, 20)
+                menuBarPreview
+                    .padding(.bottom, 20)
 
-            tipCard
-                .padding(.bottom, 24)
+                tipCard
+            }
+            .padding(.top, 32)
+            .padding(.horizontal, 28)
+            .padding(.bottom, 24)
 
+            // The button is inset by a uniform 8 pt so its bottom corners are
+            // optically concentric with the card's 16 pt corners (8 + 8 = 16).
             Button(action: onDismiss) {
                 Text("Get Started")
                     .font(.system(size: 14, weight: .medium))
@@ -101,13 +107,12 @@ struct FirstLaunchView: View {
                     .background(accentBlue, in: RoundedRectangle(cornerRadius: 8))
             }
             .buttonStyle(.plain)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
         }
-        .padding(.top, 32)
-        .padding(.horizontal, 28)
-        .padding(.bottom, 24)
         .frame(width: 380)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Menu bar preview
