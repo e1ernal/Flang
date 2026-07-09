@@ -80,11 +80,10 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func showEmojiSymbols() {
-        // Dispatch after the menu dismisses: TISSelectInputSource for a palette
-        // source is ignored while NSMenu is still in tracking mode.
-        DispatchQueue.main.async { [self] in
-            manager.activateSource(id: characterPaletteID)
-        }
+        // TISSelectInputSource for CharacterPaletteIM returns 0 but silently does
+        // nothing for an agent app. Opening CharacterPalette.app directly works.
+        let url = URL(fileURLWithPath: "/System/Library/Input Methods/CharacterPalette.app")
+        NSWorkspace.shared.open(url)
     }
 
     @objc private func showKeyboardViewer() {
