@@ -10,9 +10,24 @@ import AppKit
 /// Application lifecycle only. All menu bar UI lives in `StatusItemController`.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let inputSourceManager = InputSourceManager()
+    private let settings = SettingsStore()
     private var statusItemController: StatusItemController?
+    private var settingsWindowController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItemController = StatusItemController(manager: inputSourceManager)
+        settings.load()
+        let controller = StatusItemController(
+            manager: inputSourceManager,
+            settings: settings
+        )
+        statusItemController = controller
+        settingsWindowController = SettingsWindowController(
+            settings: settings,
+            flagStore: controller.flagStore,
+            manager: inputSourceManager
+        )
+        controller.onOpenSettings = { [weak self] in
+            self?.settingsWindowController?.showWindow()
+        }
     }
 }
