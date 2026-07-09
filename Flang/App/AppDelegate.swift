@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let settings = SettingsStore()
     private var statusItemController: StatusItemController?
     private var settingsWindowController: SettingsWindowController?
+    private var firstLaunchWindowController: FirstLaunchWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         settings.load()
@@ -28,6 +29,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         controller.onOpenSettings = { [weak self] in
             self?.settingsWindowController?.showWindow()
+        }
+
+        if !settings.hasLaunchedBefore {
+            settings.launchAtLogin = true
+            settings.markAsLaunched()
+            firstLaunchWindowController = FirstLaunchWindowController()
+            firstLaunchWindowController?.showWindow()
         }
     }
 }

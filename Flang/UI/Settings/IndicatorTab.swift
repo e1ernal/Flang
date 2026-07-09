@@ -137,9 +137,10 @@ struct IndicatorTab: View {
 
     private func nameText(for source: InputSource?) -> String? {
         guard let source else { return nil }
+        let custom = settings.customization(for: source.id)
         switch settings.nameSetting {
-        case .short: return source.shortName
-        case .full: return source.name
+        case .short: return custom.shortName ?? source.shortName
+        case .full: return custom.fullName ?? source.name
         case .none: return nil
         }
     }

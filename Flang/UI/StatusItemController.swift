@@ -12,7 +12,7 @@ import AppKit
 final class StatusItemController: NSObject {
     private let statusItem: NSStatusItem
     private let manager: InputSourceManager
-    let flagStore = FlagStore()
+    let flagStore: FlagStore
     private let settings: SettingsStore
 
     /// Called when the user picks "Settings…" from the right-click menu.
@@ -35,6 +35,7 @@ final class StatusItemController: NSObject {
     init(manager: InputSourceManager, settings: SettingsStore) {
         self.manager = manager
         self.settings = settings
+        self.flagStore = FlagStore(settings: settings)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
 
@@ -128,9 +129,10 @@ final class StatusItemController: NSObject {
     }
 
     private func nameText(for source: InputSource) -> String? {
+        let custom = settings.customization(for: source.id)
         switch settings.nameSetting {
-        case .short: return source.shortName
-        case .full: return truncated(source.name)
+        case .short: return custom.shortName ?? source.shortName
+        case .full: return truncated(custom.fullName ?? source.name)
         case .none: return nil
         }
     }
@@ -165,8 +167,10 @@ final class StatusItemController: NSObject {
         let menuMode = settings.menuFlagMode
 
         for source in sources {
+            let custom = settings.customization(for: source.id)
+            let displayName = custom.fullName ?? source.name
             let item = NSMenuItem(
-                title: source.name,
+                title: displayName,
                 action: #selector(inputSourceItemClicked(_:)),
                 keyEquivalent: ""
             )
@@ -174,7 +178,7 @@ final class StatusItemController: NSObject {
             item.image = flagStore.image(for: source, mode: menuMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
-            item.toolTip = source.name
+            item.toolTip = displayName
             menu.addItem(item)
         }
 

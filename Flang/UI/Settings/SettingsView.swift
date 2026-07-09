@@ -107,20 +107,10 @@ struct SettingsView: View {
         case .indicator:
             IndicatorTab(settings: settings, flagStore: flagStore, manager: manager)
         case .inputSources:
-            placeholderTab("Input Sources", detail: "Coming in Phase 4b-3.")
+            InputSourcesTab(settings: settings, flagStore: flagStore, manager: manager)
         case .about:
-            placeholderTab("About", detail: "Coming in Phase 4b-4.")
+            AboutTab()
         }
     }
 
-    private func placeholderTab(_ title: String, detail: String) -> some View {
-        VStack {
-            Text(title)
-                .font(.system(size: 22, weight: .bold))
-            Text(detail)
-                .foregroundStyle(.secondary)
-                .font(.system(size: 13))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
 }
