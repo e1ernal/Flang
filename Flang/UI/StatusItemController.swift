@@ -75,20 +75,8 @@ final class StatusItemController: NSObject {
         manager.selectInputSource(id: id)
     }
 
-    @objc
-    private func flagSettingChanged(_ sender: NSMenuItem) {
-        guard let raw = sender.representedObject as? String,
-              let value = SettingsStore.FlagSetting(rawValue: raw) else { return }
-        settings.flagSetting = value
-        updateIndicator(for: manager.currentInputSource)
-    }
-
-    @objc
-    private func nameSettingChanged(_ sender: NSMenuItem) {
-        guard let raw = sender.representedObject as? String,
-              let value = SettingsStore.NameSetting(rawValue: raw) else { return }
-        settings.nameSetting = value
-        updateIndicator(for: manager.currentInputSource)
+    @objc private func openSettings() {
+        // Settings window is wired in Phase 4b-2.
     }
 
     @objc private func showEmojiSymbols() {
@@ -172,13 +160,12 @@ final class StatusItemController: NSObject {
 
     // MARK: - Menus (FR-2, FR-5)
 
-    /// The main (left-click) menu: input sources, then the Flag/Name settings, then
-    /// the system-parity block. Menu rows always show flag + full name (FR-2).
+    /// The main (left-click) menu: exact copy of the system input menu (FR-2).
+    /// Sources, then system parity items. No app-specific items.
     private func buildMainMenu() -> NSMenu {
         let menu = NSMenu()
         let sources = manager.inputSources
         let menuMode = settings.menuFlagMode
-        let hasKeyboardViewer = manager.isSourceEnabled(id: keyboardViewerID)
 
         for source in sources {
             let item = NSMenuItem(
@@ -195,11 +182,6 @@ final class StatusItemController: NSObject {
         }
 
         menu.addItem(.separator())
-        let valueEdge = settingsValueEdge()
-        menu.addItem(makeFlagSettingItem(valueEdge: valueEdge))
-        menu.addItem(makeNameSettingItem(valueEdge: valueEdge))
-
-        menu.addItem(.separator())
         if manager.isSourceEnabled(id: characterPaletteID) {
             menu.addItem(makeActionItem(
                 "Show Emoji & Symbols",
@@ -207,7 +189,7 @@ final class StatusItemController: NSObject {
                 icon: parityIcon(sourceID: characterPaletteID)
             ))
         }
-        if hasKeyboardViewer {
+        if manager.isSourceAvailable(id: keyboardViewerID) {
             menu.addItem(makeActionItem(
                 "Show Keyboard Viewer",
                 #selector(showKeyboardViewer),
@@ -220,99 +202,17 @@ final class StatusItemController: NSObject {
         return menu
     }
 
-    /// The app (right-click) menu: application-level items. For now only Quit; the
-    /// Settings window entry is added in Phase 4b.
+    /// The app (right-click / ⌃-click) menu: Settings and Quit (FR-5).
     private func buildAppMenu() -> NSMenu {
         let menu = NSMenu()
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+        menu.addItem(.separator())
         let quitItem = NSMenuItem(title: "Quit Flang", action: #selector(quitClicked), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
         return menu
-    }
-
-    private func makeFlagSettingItem(valueEdge: CGFloat) -> NSMenuItem {
-        let options: [(value: SettingsStore.FlagSetting, title: String)] = [
-            (.image, "Image"),
-            (.emoji, "Emoji"),
-            (.none, "None")
-        ]
-        let submenu = NSMenu()
-        for option in options {
-            let item = NSMenuItem(title: option.title, action: #selector(flagSettingChanged(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = option.value.rawValue
-            item.state = (option.value == settings.flagSetting) ? .on : .off
-            submenu.addItem(item)
-        }
-        let parent = NSMenuItem()
-        parent.attributedTitle = menuTitle("Flag", value: flagValueTitle, valueEdge: valueEdge)
-        parent.submenu = submenu
-        return parent
-    }
-
-    private func makeNameSettingItem(valueEdge: CGFloat) -> NSMenuItem {
-        let options: [(value: SettingsStore.NameSetting, title: String)] = [
-            (.short, "Short"),
-            (.full, "Full"),
-            (.none, "None")
-        ]
-        let submenu = NSMenu()
-        for option in options {
-            let item = NSMenuItem(title: option.title, action: #selector(nameSettingChanged(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = option.value.rawValue
-            item.state = (option.value == settings.nameSetting) ? .on : .off
-            submenu.addItem(item)
-        }
-        let parent = NSMenuItem()
-        parent.attributedTitle = menuTitle("Name", value: nameValueTitle, valueEdge: valueEdge)
-        parent.submenu = submenu
-        return parent
-    }
-
-    private var flagValueTitle: String {
-        switch settings.flagSetting {
-        case .image: return "Image"
-        case .emoji: return "Emoji"
-        case .none: return "None"
-        }
-    }
-
-    private var nameValueTitle: String {
-        switch settings.nameSetting {
-        case .short: return "Short"
-        case .full: return "Full"
-        case .none: return "None"
-        }
-    }
-
-    /// A menu title with the current value in gray, right-aligned at `valueEdge` so the
-    /// Flag and Name values line up by their right edge, just before the submenu arrow.
-    private func menuTitle(_ label: String, value: String, valueEdge: CGFloat) -> NSAttributedString {
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.tabStops = [NSTextTab(textAlignment: .right, location: valueEdge)]
-        let result = NSMutableAttributedString(string: label + "\t", attributes: [.paragraphStyle: paragraph])
-        result.append(NSAttributedString(
-            string: value,
-            attributes: [.foregroundColor: NSColor.secondaryLabelColor, .paragraphStyle: paragraph]
-        ))
-        return result
-    }
-
-    /// Right-edge position for the Flag/Name values, sized to just the two setting
-    /// rows so their gray values align with each other in a compact column (not pushed
-    /// to the menu's far edge).
-    private func settingsValueEdge() -> CGFloat {
-        let font = NSFont.menuFont(ofSize: 0)
-        func width(_ text: String) -> CGFloat {
-            (text as NSString).size(withAttributes: [.font: font]).width
-        }
-        // Gap between the widest label and the value column.
-        let gap: CGFloat = 24
-        return max(
-            width("Flag") + gap + width(flagValueTitle),
-            width("Name") + gap + width(nameValueTitle)
-        )
     }
 
     private func makeActionItem(_ title: String, _ action: Selector, icon: NSImage? = nil) -> NSMenuItem {

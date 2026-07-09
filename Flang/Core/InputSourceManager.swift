@@ -127,16 +127,25 @@ final class InputSourceManager {
         }
     }
 
-    /// Whether an enabled input source with this id exists. Used to hide menu items
-    /// whose system mechanism is unavailable (FR-2 degradation rule).
+    /// Whether an enabled input source with this id exists. Used to gate menu items
+    /// whose mechanism is unavailable (FR-2 degradation rule).
     func isSourceEnabled(id: String) -> Bool {
         enabledSource(id: id) != nil
+    }
+
+    /// Whether an installed (not necessarily enabled) source exists. Uses a filtered
+    /// `TISCreateInputSourceList` with a specific ID — unlike the unfiltered
+    /// `(nil, true)` call this does NOT re-enable all installed sources. Used to
+    /// detect Keyboard Viewer on macOS versions where it exists as a palette source
+    /// but is not in the enabled list (SPEC FR-2 note).
+    func isSourceAvailable(id: String) -> Bool {
+        installedSource(id: id) != nil
     }
 
     /// Activate an enabled source by id — used for palette sources like the Character
     /// Viewer (`com.apple.CharacterPaletteIM`).
     func activateSource(id: String) {
-        guard let source = enabledSource(id: id) else { return }
+        guard let source = enabledSource(id: id) ?? installedSource(id: id) else { return }
         let status = TISSelectInputSource(source)
         if status != noErr {
             logger.error("Failed to activate source \(id, privacy: .public): OSStatus \(status)")
@@ -154,10 +163,22 @@ final class InputSourceManager {
         return list.first { $0.id == id }
     }
 
-    /// The system icon of an enabled source (e.g. the Character Viewer palette),
-    /// used to give parity menu items their real macOS icon (FR-2).
+    /// Look up a source among ALL installed sources (including non-enabled) using a
+    /// filtered query. Passing a filter dict with a specific ID avoids the side effect
+    /// of `TISCreateInputSourceList(nil, true)` which re-enables all installed sources.
+    private func installedSource(id: String) -> TISInputSource? {
+        let filter = [kTISPropertyInputSourceID: id] as CFDictionary
+        guard let list = TISCreateInputSourceList(filter, true)?.takeRetainedValue() as? [TISInputSource] else {
+            return nil
+        }
+        return list.first
+    }
+
+    /// The system icon of an enabled or installed source (e.g. the Character Viewer
+    /// palette or Keyboard Viewer), used to give parity menu items their icon (FR-2).
     func icon(forSourceID id: String) -> NSImage? {
-        guard let source = enabledSource(id: id), let url = source.iconImageURL else { return nil }
+        guard let source = enabledSource(id: id) ?? installedSource(id: id),
+              let url = source.iconImageURL else { return nil }
         return NSImage(contentsOf: url)
     }
 
