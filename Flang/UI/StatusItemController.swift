@@ -80,13 +80,17 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func showEmojiSymbols() {
-        // Activating the Character Palette source opens the Emoji & Symbols window
-        // system-wide (orderFrontCharacterPalette does nothing for a menu-bar agent).
-        manager.activateSource(id: characterPaletteID)
+        // Dispatch after the menu dismisses: TISSelectInputSource for a palette
+        // source is ignored while NSMenu is still in tracking mode.
+        DispatchQueue.main.async { [self] in
+            manager.activateSource(id: characterPaletteID)
+        }
     }
 
     @objc private func showKeyboardViewer() {
-        manager.activateSource(id: keyboardViewerID)
+        DispatchQueue.main.async { [self] in
+            manager.activateSource(id: keyboardViewerID)
+        }
     }
 
     @objc private func openKeyboardSettings() {
