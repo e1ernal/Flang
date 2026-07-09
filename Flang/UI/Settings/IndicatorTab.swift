@@ -110,7 +110,12 @@ struct IndicatorTab: View {
                     .font(.system(size: 14, weight: .medium))
             }
             if flagImage(for: source) == nil && nameText(for: source) == nil {
-                if let source {
+                if let source, let icon = flagStore.systemIcon(for: source, height: 16) {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 16)
+                } else if let source {
                     Text(source.shortName)
                         .font(.system(size: 14, weight: .medium))
                 }
