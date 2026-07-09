@@ -75,7 +75,7 @@ struct FirstLaunchView: View {
 
             Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: 400, height: 320)
     }
 
     private func hintRow(icon: String, text: String) -> some View {
