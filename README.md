@@ -52,15 +52,13 @@ Build and run with Cmd+R (Xcode 16 or newer, macOS 13 Ventura or newer).
    macOS does not allow apps to do this automatically, so it is a one-time
    manual step.
 
-   <!-- TODO(docs/images/hide-system-switcher.png): screenshot of System
-   Settings — Keyboard, with "Show Input menu in menu bar" highlighted -->
+   <img src="docs/images/hide-system-switcher.png" width="500" alt="System Settings — Keyboard, with &quot;Show Input menu in menu bar&quot; highlighted">
 
-4. To add or remove a keyboard layout, use Settings — Input Sources — the "+"
-   button (or Delete on a source) opens System Settings — Keyboard — Input
-   Sources, where macOS handles it directly.
+4. To add or remove a keyboard layout, open Settings — Input Sources and use
+   the "+" button (or Delete on a source) — both hand off to System
+   Settings — Keyboard — Input Sources, where macOS handles it directly.
 
-   <!-- TODO(docs/images/add-input-source.png): screenshot of System
-   Settings — Keyboard — Input Sources, with the "+" button highlighted -->
+   <img src="docs/images/add-input-source.png" width="500" alt="Flang's Input Sources tab, with the &quot;+&quot; button highlighted">
 
 ## FAQ
 
