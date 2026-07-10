@@ -69,6 +69,7 @@ final class InputSourceManager: ObservableObject {
     init() {
         notificationCenter = CFNotificationCenterGetDistributedCenter()
         registerForNotifications()
+        registerForActivationRefresh()
     }
 
     deinit {
@@ -97,6 +98,16 @@ final class InputSourceManager: ObservableObject {
                 $0.category == kTISCategoryKeyboardInputSource as String
                     && $0.isSelectable
                     && $0.isEnabled
+            }
+            // The bulk (nil-filter) list can keep listing a source for a while
+            // after it's fully removed in System Settings — outright deletion
+            // doesn't reliably invalidate it the way toggling one off does.
+            // Cross-check each candidate with a filtered, single-ID query (the
+            // same safe pattern already used by `installedSource(id:)`), which
+            // reflects the deletion promptly.
+            .filter { source in
+                guard let id = source.id else { return false }
+                return isActuallyEnabled(id: id)
             }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
 
@@ -170,6 +181,15 @@ final class InputSourceManager: ObservableObject {
         return list.first
     }
 
+    /// Fresh, single-ID re-check of whether a source the bulk list just returned
+    /// is genuinely still enabled. Filtered queries (unlike the bulk `nil`-filter
+    /// one `inputSources` starts from) seem to reflect a just-deleted source
+    /// promptly instead of holding onto a stale snapshot — same safe pattern as
+    /// `installedSource(id:)`, so it carries no reactivation side effect.
+    private func isActuallyEnabled(id: String) -> Bool {
+        installedSource(id: id)?.isEnabled ?? false
+    }
+
     /// The system icon of an enabled or installed source (e.g. the Keyboard Viewer
     /// palette), used to give parity menu items their icon (FR-2).
     func icon(forSourceID id: String) -> NSImage? {
@@ -195,14 +215,34 @@ final class InputSourceManager: ObservableObject {
     /// System Settings — `TISCreateInputSourceList` briefly keeps returning the
     /// old set. Re-check shortly after the first notification so a just-deleted
     /// source doesn't linger in the menu/Settings list until something else
-    /// happens to trigger a re-query.
+    /// happens to trigger a re-query. Deleting a source outright (as opposed to
+    /// just disabling one) seems to settle slower than the enable/disable case
+    /// this was first written for, hence the second, later retry.
     private func notifyEnabledSourcesChanged() {
         delegate?.enabledInputSourcesDidChange()
         objectWillChange.send()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self else { return }
-            self.delegate?.enabledInputSourcesDidChange()
-            self.objectWillChange.send()
+        for delay in [0.3, 1.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self else { return }
+                self.delegate?.enabledInputSourcesDidChange()
+                self.objectWillChange.send()
+            }
+        }
+    }
+
+    /// TIS notifications aren't reliably posted for every kind of System
+    /// Settings change — deleting a source outright doesn't seem to trigger
+    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` the way disabling one
+    /// does. Refresh whenever Flang regains focus too, since the common flow
+    /// is "make the change in System Settings, switch back to Flang" — a
+    /// signal that doesn't depend on TIS posting anything at all.
+    private func registerForActivationRefresh() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.notifyEnabledSourcesChanged()
         }
     }
 

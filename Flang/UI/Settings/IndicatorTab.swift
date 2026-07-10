@@ -128,7 +128,7 @@ struct IndicatorTab: View {
                     .foregroundStyle(theme.primaryText)
             }
             if flagImage(for: source) == nil && name == nil {
-                if let source, let icon = flagStore.systemIcon(for: source, height: 16) {
+                if let source, let icon = flagStore.systemIcon(for: source, height: 16, dark: theme.isDark) {
                     Image(nsImage: icon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
