@@ -99,6 +99,16 @@ final class InputSourceManager: ObservableObject {
                     && $0.isSelectable
                     && $0.isEnabled
             }
+            // The bulk (nil-filter) list can keep listing a source for a while
+            // after it's fully removed in System Settings — outright deletion
+            // doesn't reliably invalidate it the way toggling one off does.
+            // Cross-check each candidate with a filtered, single-ID query (the
+            // same safe pattern already used by `installedSource(id:)`), which
+            // reflects the deletion promptly.
+            .filter { source in
+                guard let id = source.id else { return false }
+                return isActuallyEnabled(id: id)
+            }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
 
         // Collapse sources that share a localized name (e.g. two Japanese input
@@ -169,6 +179,15 @@ final class InputSourceManager: ObservableObject {
             return nil
         }
         return list.first
+    }
+
+    /// Fresh, single-ID re-check of whether a source the bulk list just returned
+    /// is genuinely still enabled. Filtered queries (unlike the bulk `nil`-filter
+    /// one `inputSources` starts from) seem to reflect a just-deleted source
+    /// promptly instead of holding onto a stale snapshot — same safe pattern as
+    /// `installedSource(id:)`, so it carries no reactivation side effect.
+    private func isActuallyEnabled(id: String) -> Bool {
+        installedSource(id: id)?.isEnabled ?? false
     }
 
     /// The system icon of an enabled or installed source (e.g. the Keyboard Viewer
