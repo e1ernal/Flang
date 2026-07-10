@@ -190,6 +190,22 @@ final class InputSourceManager: ObservableObject {
         )
     }
 
+    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` can arrive slightly before
+    /// TIS's own enabled-sources list actually reflects an add/remove made in
+    /// System Settings — `TISCreateInputSourceList` briefly keeps returning the
+    /// old set. Re-check shortly after the first notification so a just-deleted
+    /// source doesn't linger in the menu/Settings list until something else
+    /// happens to trigger a re-query.
+    private func notifyEnabledSourcesChanged() {
+        delegate?.enabledInputSourcesDidChange()
+        objectWillChange.send()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            self.delegate?.enabledInputSourcesDidChange()
+            self.objectWillChange.send()
+        }
+    }
+
     private func registerForNotifications() {
         let observer = Unmanaged.passUnretained(self).toOpaque()
         let selected = kTISNotifySelectedKeyboardInputSourceChanged as String
@@ -201,10 +217,10 @@ final class InputSourceManager: ObservableObject {
             DispatchQueue.main.async {
                 if rawName == (kTISNotifySelectedKeyboardInputSourceChanged as String) {
                     manager.delegate?.selectedInputSourceDidChange()
+                    manager.objectWillChange.send()
                 } else if rawName == (kTISNotifyEnabledKeyboardInputSourcesChanged as String) {
-                    manager.delegate?.enabledInputSourcesDidChange()
+                    manager.notifyEnabledSourcesChanged()
                 }
-                manager.objectWillChange.send()
             }
         }
 
