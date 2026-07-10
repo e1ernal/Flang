@@ -40,11 +40,15 @@ final class SettingsWindowController {
         let size = FlangSpacing.settingsWindowSize
         let newWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: size.width, height: size.height),
-            styleMask: [.titled, .closable, .miniaturizable],
+            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        newWindow.title = "Flang Settings"
+        // No title bar chrome: the sidebar draws its own "Flang" wordmark, and
+        // the content view extends under where the title bar would be so the
+        // traffic lights sit directly on the sidebar's own background.
+        newWindow.titlebarAppearsTransparent = true
+        newWindow.titleVisibility = .hidden
         newWindow.contentView = hostingView
         newWindow.isReleasedWhenClosed = false
         newWindow.center()

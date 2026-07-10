@@ -30,23 +30,11 @@ struct SettingsView: View {
             case .about: return "About"
             }
         }
-
-        var icon: String {
-            switch self {
-            case .general: return "gearshape"
-            case .indicator: return "flag"
-            case .inputSources: return "lock"
-            case .about: return "info.circle"
-            }
-        }
     }
 
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-                .padding(.top, FlangSpacing.sidebarMargin)
-                .padding(.leading, FlangSpacing.sidebarMargin)
-                .padding(.bottom, FlangSpacing.sidebarMargin)
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
@@ -58,7 +46,13 @@ struct SettingsView: View {
 
     private var sidebar: some View {
         VStack(spacing: 2) {
-            header
+            // "Flang" sits at screenTop, the same height as every tab's own
+            // title, and clears the window's traffic lights (the window has
+            // no title bar chrome — see SettingsWindowController).
+            Text("Flang")
+                .font(FlangFont.sidebarApp)
+                .foregroundStyle(theme.sidebarTitleText)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, FlangSpacing.sidebarPadding)
                 .padding(.bottom, FlangSpacing.sidebarHeaderGap)
 
@@ -71,25 +65,12 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .padding(.top, FlangSpacing.sidebarPaddingTop)
+        .padding(.top, FlangSpacing.screenTop)
         .padding(.horizontal, FlangSpacing.sidebarPadding)
         .padding(.bottom, FlangSpacing.sidebarPaddingBottom)
         .frame(width: FlangSpacing.sidebarWidth)
+        .frame(maxHeight: .infinity)
         .background(theme.sidebarBackground)
-        .clipShape(RoundedRectangle(cornerRadius: FlangRadius.sidebarPanel))
-        .overlay(
-            RoundedRectangle(cornerRadius: FlangRadius.sidebarPanel)
-                .strokeBorder(theme.primaryText.opacity(0.08), lineWidth: 0.5)
-        )
-    }
-
-    private var header: some View {
-        HStack(spacing: 8) {
-            FlangAppIcon(size: FlangSpacing.sidebarAppIconSize)
-            Text("Flang")
-                .font(FlangFont.sidebarApp)
-                .foregroundStyle(theme.sidebarTitleText)
-        }
     }
 
     private var sidebarDivider: some View {
@@ -102,19 +83,15 @@ struct SettingsView: View {
         Button {
             selection = tab
         } label: {
-            HStack(spacing: 8) {
-                Image(systemName: tab.icon)
-                    .frame(width: 16)
-                Text(tab.label)
-                    .font(FlangFont.sidebarItem)
-                Spacer()
-            }
-            .padding(FlangSpacing.sidebarPadding)
-            .background(
-                RoundedRectangle(cornerRadius: FlangRadius.sidebarItem)
-                    .fill(selection == tab ? theme.sidebarSelection : Color.clear)
-            )
-            .foregroundStyle(selection == tab ? theme.onAccent : theme.sidebarItemText)
+            Text(tab.label)
+                .font(FlangFont.sidebarItem)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(FlangSpacing.sidebarPadding)
+                .background(
+                    RoundedRectangle(cornerRadius: FlangRadius.sidebarItem)
+                        .fill(selection == tab ? theme.sidebarSelection : Color.clear)
+                )
+                .foregroundStyle(selection == tab ? theme.onAccent : theme.sidebarItemText)
         }
         .buttonStyle(.plain)
     }

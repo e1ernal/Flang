@@ -78,6 +78,7 @@ struct GeneralTab: View {
                 set: { settings.launchAtLogin = $0 }
             ))
             .labelsHidden()
+            .toggleStyle(.switch)
             .tint(theme.toggleOn)
         }
         .padding(FlangSpacing.cardPadding)

@@ -12,7 +12,11 @@ import SwiftUI
 enum FlangSpacing {
     /// Every value here is a multiple of 8, rounded from the original mockup
     /// measurements (`_local/design/INDEX.md`) to a consistent 8pt grid.
-    static let screenTop: CGFloat = 48
+    /// `screenTop` is shared by every tab's title AND the sidebar's own
+    /// header, so both align at the same height as the window's traffic
+    /// lights (a titlebar-less, full-size-content-view window — see
+    /// `SettingsWindowController`).
+    static let screenTop: CGFloat = 40
     static let screenSides: CGFloat = 32
 
     static let cardPadding: CGFloat = 16
@@ -26,20 +30,11 @@ enum FlangSpacing {
     static let settingsWindowSize = CGSize(width: 640, height: 424)
     static let sidebarWidth: CGFloat = 176
 
-    /// The sidebar floats as an inset rounded panel (mockup: `margin: 14px 0 14px
-    /// 14px`), not flush against the window edges — this is that inset, rounded
-    /// from 14.
-    static let sidebarMargin: CGFloat = 16
-    static let sidebarPaddingTop: CGFloat = 24
     /// Side padding for the sidebar's own content, and reused as each item row's
-    /// own horizontal/vertical padding (mockup: 10px sides on the container, 7px
-    /// vertical / 10px horizontal per row — both round to 8, so one constant
-    /// covers both nesting levels).
+    /// own horizontal/vertical padding.
     static let sidebarPadding: CGFloat = 8
     static let sidebarPaddingBottom: CGFloat = 16
     static let sidebarHeaderGap: CGFloat = 16
-    /// Small logo mark next to "Flang" in the sidebar header (mockup: 22pt).
-    static let sidebarAppIconSize: CGFloat = 24
 }
 
 /// Two independent radius scales: `card`/`sidebarItem`/`field` for the
@@ -63,11 +58,6 @@ enum FlangRadius {
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
     static let heroIcon: CGFloat = field
-
-    /// The sidebar's own floating-panel corner radius (mockup: 16px) — a
-    /// distinct role from `card`, even though `heroButton` happens to share
-    /// the same value.
-    static let sidebarPanel: CGFloat = 16
 
     /// macOS's own app-icon corner radius is ~22.37% of the canvas size (the
     /// "squircle" ratio behind every Big Sur+ icon template). Applied to
