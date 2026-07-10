@@ -180,24 +180,28 @@ final class StatusItemController: NSObject {
         menu.addItem(.separator())
         if manager.isSourceAvailable(id: keyboardViewerID) {
             menu.addItem(makeActionItem(
-                "Show Keyboard Viewer",
+                String(localized: "Show Keyboard Viewer"),
                 #selector(showKeyboardViewer),
                 icon: parityIcon(sourceID: keyboardViewerID)
             ))
         }
         menu.addItem(.separator())
-        menu.addItem(makeActionItem("Open Keyboard Settings…", #selector(openKeyboardSettings)))
+        menu.addItem(makeActionItem(String(localized: "Open Keyboard Settings…"), #selector(openKeyboardSettings)))
 
         return menu
     }
 
     private func buildAppMenu() -> NSMenu {
         let menu = NSMenu()
-        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(
+            title: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ","
+        )
         settingsItem.target = self
         menu.addItem(settingsItem)
         menu.addItem(.separator())
-        let quitItem = NSMenuItem(title: "Quit Flang", action: #selector(quitClicked), keyEquivalent: "q")
+        let quitItem = NSMenuItem(
+            title: String(localized: "Quit Flang"), action: #selector(quitClicked), keyEquivalent: "q"
+        )
         quitItem.target = self
         menu.addItem(quitItem)
         return menu

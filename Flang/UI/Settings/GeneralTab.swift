@@ -12,19 +12,19 @@ struct GeneralTab: View {
     @ObservedObject var settings: SettingsStore
 
     @State private var showLanguagePicker = false
+    @State private var pendingRelaunchLanguage: String?
 
     @Environment(\.colorScheme) private var scheme
     private var theme: FlangColor { FlangColor(scheme) }
 
+    /// Only languages with an actual translation ship in the picker (FR-12, v1.0:
+    /// EN + RU — see `_local/SPEC.md` roadmap). The full 7-language set from the
+    /// design mockup lands in 1.1 once translated; listing untranslated languages
+    /// now would silently fall back to English with no explanation.
     private let languages: [(code: String, name: String)] = [
-        ("system", "System Default"),
-        ("en", "English"),
-        ("zh-Hans", "Chinese, Simplified"),
-        ("es", "Spanish"),
-        ("fr", "French"),
-        ("pt-BR", "Portuguese, Brazilian"),
-        ("ja", "Japanese"),
-        ("ru", "Russian")
+        ("system", String(localized: "System Default")),
+        ("en", Locale.current.localizedString(forLanguageCode: "en") ?? "English"),
+        ("ru", Locale.current.localizedString(forLanguageCode: "ru") ?? "Russian")
     ]
 
     var body: some View {
@@ -84,6 +84,10 @@ struct GeneralTab: View {
         .padding(FlangSpacing.cardPadding)
     }
 
+    private var currentLanguageName: String {
+        languages.first { $0.code == settings.interfaceLanguage }?.name ?? languages[0].name
+    }
+
     private var interfaceLanguageRow: some View {
         Button {
             withAnimation(FlangMotion.tabTransition) { showLanguagePicker = true }
@@ -93,7 +97,7 @@ struct GeneralTab: View {
                     .font(FlangFont.label)
                     .foregroundStyle(theme.primaryText)
                 Spacer()
-                Text("English")
+                Text(currentLanguageName)
                     .font(FlangFont.label)
                     .foregroundStyle(theme.secondaryText)
                 Image(systemName: "chevron.up.chevron.down")
@@ -141,28 +145,68 @@ struct GeneralTab: View {
                     if index > 0 {
                         FlangSeparator(theme: theme).padding(.horizontal, 16)
                     }
-                    HStack {
-                        Text(lang.name)
-                            .font(FlangFont.label)
-                            .foregroundStyle(lang.code == "en" ? theme.pickerSelectedText : theme.primaryText)
-                        Spacer()
-                        if lang.code == "en" {
-                            Image(systemName: "checkmark")
-                                .font(FlangFont.chevron)
-                                .foregroundStyle(theme.accent)
+                    let isSelected = lang.code == settings.interfaceLanguage
+                    Button {
+                        selectLanguage(lang.code)
+                    } label: {
+                        HStack {
+                            Text(lang.name)
+                                .font(FlangFont.label)
+                                .foregroundStyle(isSelected ? theme.pickerSelectedText : theme.primaryText)
+                            Spacer()
+                            if isSelected {
+                                Image(systemName: "checkmark")
+                                    .font(FlangFont.chevron)
+                                    .foregroundStyle(theme.accent)
+                            }
                         }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, FlangSpacing.cardPadding)
+                        .background(isSelected ? theme.pickerSelectedBackground : Color.clear)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, FlangSpacing.cardPadding)
-                    .background(lang.code == "en" ? theme.pickerSelectedBackground : Color.clear)
-                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
                 }
             }
             .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
 
-            Text("Translations are added in a future update.")
+            Text("More languages are coming in a future update.")
                 .font(FlangFont.caption)
                 .foregroundStyle(theme.secondaryText)
+        }
+        .alert(
+            "Restart Flang to Apply?",
+            isPresented: Binding(
+                get: { pendingRelaunchLanguage != nil },
+                set: { if !$0 { pendingRelaunchLanguage = nil } }
+            )
+        ) {
+            Button("Later", role: .cancel) { pendingRelaunchLanguage = nil }
+            Button("Restart Now") { relaunch() }
+        } message: {
+            Text("The new interface language takes effect after Flang restarts.")
+        }
+    }
+
+    private func selectLanguage(_ code: String) {
+        guard code != settings.interfaceLanguage else { return }
+        settings.interfaceLanguage = code
+        pendingRelaunchLanguage = code
+    }
+
+    private func relaunch() {
+        let url = Bundle.main.bundleURL
+        let configuration = NSWorkspace.OpenConfiguration()
+        // Without this, openApplication just activates the already-running
+        // instance (us) instead of spawning a new one — terminating right after
+        // then raced LaunchServices trying to activate a process mid-quit,
+        // surfacing "The application is not open anymore".
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: url, configuration: configuration) { app, error in
+            guard app != nil, error == nil else { return }
+            DispatchQueue.main.async {
+                NSApp.terminate(nil)
+            }
         }
     }
 }

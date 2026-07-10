@@ -25,10 +25,10 @@ struct SettingsView: View {
 
         var label: String {
             switch self {
-            case .general: return "General"
-            case .indicator: return "Indicator"
-            case .inputSources: return "Input Sources"
-            case .about: return "About"
+            case .general: return String(localized: "General")
+            case .indicator: return String(localized: "Indicator")
+            case .inputSources: return String(localized: "Input Sources")
+            case .about: return String(localized: "About")
             }
         }
     }

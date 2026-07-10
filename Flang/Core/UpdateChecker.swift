@@ -59,7 +59,7 @@ final class UpdateChecker: ObservableObject {
         do {
             let (data, response) = try await session.data(for: request)
             guard let http = response as? HTTPURLResponse else {
-                lastError = "Couldn't reach GitHub."
+                lastError = String(localized: "Couldn't reach GitHub.")
                 settings.lastUpdateCheck = Date()
                 return
             }
@@ -79,10 +79,13 @@ final class UpdateChecker: ObservableObject {
                     newerRelease = nil
                 }
             default:
-                lastError = "GitHub returned an error (HTTP \(http.statusCode))."
+                // The numeric status is appended untranslated rather than embedded in
+                // the localized string, to avoid guessing Swift's Int format specifier
+                // for a detail the user will rarely see.
+                lastError = String(localized: "GitHub returned an error.") + " (HTTP \(http.statusCode))"
             }
         } catch {
-            lastError = "Couldn't check for updates."
+            lastError = String(localized: "Couldn't check for updates.")
         }
         settings.lastUpdateCheck = Date()
     }

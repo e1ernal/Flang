@@ -240,7 +240,9 @@ extension InputSourcesTab {
         .background(theme.sectionBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
-    private func flagRow(_ label: String, code: String?, source: InputSource, mode: FlagStore.Mode) -> some View {
+    private func flagRow(
+        _ label: LocalizedStringKey, code: String?, source: InputSource, mode: FlagStore.Mode
+    ) -> some View {
         let effectiveCode = code ?? flagStore.defaultCountryCode(for: source)
         return Button {
             flagPicker = FlagPickerContext(sourceID: source.id, mode: mode)
@@ -291,7 +293,9 @@ extension InputSourcesTab {
         .background(theme.sectionBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
-    private func nameRow(_ label: String, value: String, onCommit: @escaping (String) -> Void) -> some View {
+    private func nameRow(
+        _ label: LocalizedStringKey, value: String, onCommit: @escaping (String) -> Void
+    ) -> some View {
         HStack {
             Text(label)
                 .font(FlangFont.sectionSubtitle)
