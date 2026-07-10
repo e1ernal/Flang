@@ -55,6 +55,10 @@ enum FlangRadius {
     /// collapsing to 0 or jumping up to the 8pt grid.
     static let flagImage: CGFloat = 2
 
+    /// The Flag/Name dropdown pill in the Indicator tab — already an even
+    /// number under 8, stays as-is (see the rounding rule above).
+    static let chip: CGFloat = 6
+
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
     static let heroIcon: CGFloat = field
@@ -153,6 +157,23 @@ struct FlangColor {
     /// in light mode (the mockup does not use the same color for both).
     var pickerSelectedText: Color {
         isDark ? .white : accent
+    }
+
+    /// Background of the Flag/Name dropdown pill in the Indicator tab — a
+    /// subtler fill than `tipBackground`, since it sits on a card row rather
+    /// than directly on the window background.
+    var chipBackground: Color {
+        isDark ? Color.white.opacity(0.08) : Color.black.opacity(0.05)
+    }
+
+    /// Dropdown pill's own value text — slightly dimmer than `primaryText`.
+    var chipText: Color {
+        isDark ? Color.white.opacity(0.85) : Color.black.opacity(0.8)
+    }
+
+    /// Dropdown pill's chevron glyph — dimmer still, matching the mockup.
+    var chipChevron: Color {
+        isDark ? Color.white.opacity(0.35) : Color.black.opacity(0.3)
     }
 
     var accent: Color {

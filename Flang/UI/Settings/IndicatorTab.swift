@@ -24,12 +24,12 @@ struct IndicatorTab: View {
             Text("Indicator")
                 .font(FlangFont.screenTitle)
                 .foregroundStyle(theme.primaryText)
-                .padding(.bottom, 6)
+                .padding(.bottom, 16)
 
-            Text("Choose how the active input source appears in your menu bar.")
+            Text("Choose how the active input source appears in your menu bar — as a flag, a name, or both.")
                 .font(FlangFont.sectionSubtitle)
                 .foregroundStyle(theme.secondaryText)
-                .padding(.bottom, 20)
+                .padding(.bottom, 16)
 
             if let picker = activePicker {
                 pickerView(for: picker)
@@ -47,17 +47,17 @@ struct IndicatorTab: View {
     // MARK: - Main content
 
     private var mainContent: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             VStack(spacing: 0) {
                 settingRow("Flag", value: settings.flagSetting.title) {
                     withAnimation(FlangMotion.tabTransition) { activePicker = .flag }
                 }
-                FlangSeparator(theme: theme).padding(.leading, 16)
+                FlangSeparator(theme: theme).padding(.horizontal, FlangSpacing.cardPadding)
                 settingRow("Name", value: settings.nameSetting.title) {
                     withAnimation(FlangMotion.tabTransition) { activePicker = .name }
                 }
             }
-            .flangCard(theme)
+            .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
 
             previewCard
         }
@@ -70,14 +70,19 @@ struct IndicatorTab: View {
                     .font(FlangFont.label)
                     .foregroundStyle(theme.primaryText)
                 Spacer()
-                Text(value)
-                    .font(FlangFont.label)
-                    .foregroundStyle(theme.secondaryText)
-                Image(systemName: "chevron.right")
-                    .font(FlangFont.chevron)
-                    .foregroundStyle(theme.secondaryText)
+                HStack(spacing: 7) {
+                    Text(value)
+                        .font(FlangFont.label)
+                        .foregroundStyle(theme.chipText)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(theme.chipChevron)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
             }
-            .padding(.vertical, 8)
+            .padding(FlangSpacing.cardPadding)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -86,31 +91,34 @@ struct IndicatorTab: View {
     // MARK: - Preview
 
     private var previewCard: some View {
-        VStack(spacing: 8) {
+        HStack {
             Text("Preview")
-                .font(FlangFont.caption)
-                .foregroundStyle(theme.secondaryText)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
+                .font(FlangFont.label)
+                .foregroundStyle(theme.primaryText)
+            Spacer()
             previewIndicator
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 4)
         }
-        .flangCard(theme)
+        .padding(FlangSpacing.cardPadding)
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
     }
 
     private var previewIndicator: some View {
         let source = manager.currentInputSource
-        return HStack(spacing: 4) {
+        return HStack(spacing: 6) {
             if let source, let image = flagImage(for: source) {
                 Image(nsImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(height: 16)
+                    .frame(height: 12)
+                    .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: FlangRadius.flagImage)
+                            .strokeBorder(theme.heroFlagStroke, lineWidth: 0.5)
+                    )
             }
             if let source, let name = nameText(for: source) {
                 Text(name)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(FlangFont.label.weight(.medium))
                     .foregroundStyle(theme.primaryText)
             }
             if flagImage(for: source) == nil && nameText(for: source) == nil {
@@ -121,14 +129,11 @@ struct IndicatorTab: View {
                         .frame(height: 16)
                 } else if let source {
                     Text(source.shortName)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(FlangFont.label.weight(.medium))
                         .foregroundStyle(theme.primaryText)
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     private func flagImage(for source: InputSource?) -> NSImage? {
@@ -166,7 +171,7 @@ struct IndicatorTab: View {
                 }
             }
             .buttonStyle(.plain)
-            .foregroundStyle(theme.secondaryText)
+            .foregroundStyle(theme.accent)
 
             switch kind {
             case .flag: flagPicker
@@ -178,25 +183,25 @@ struct IndicatorTab: View {
     private var flagPicker: some View {
         VStack(spacing: 0) {
             ForEach(Array(SettingsStore.FlagSetting.allCases.enumerated()), id: \.element.id) { index, option in
-                if index > 0 { FlangSeparator(theme: theme).padding(.leading, 16) }
+                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, 16) }
                 pickerRow(option.title, selected: settings.flagSetting == option) {
                     settings.flagSetting = option
                 }
             }
         }
-        .flangCard(theme)
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
     }
 
     private var namePicker: some View {
         VStack(spacing: 0) {
             ForEach(Array(SettingsStore.NameSetting.allCases.enumerated()), id: \.element.id) { index, option in
-                if index > 0 { FlangSeparator(theme: theme).padding(.leading, 16) }
+                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, 16) }
                 pickerRow(option.title, selected: settings.nameSetting == option) {
                     settings.nameSetting = option
                 }
             }
         }
-        .flangCard(theme)
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
     }
 
     private func pickerRow(_ label: String, selected: Bool, action: @escaping () -> Void) -> some View {
@@ -204,7 +209,7 @@ struct IndicatorTab: View {
             HStack {
                 Text(label)
                     .font(FlangFont.label)
-                    .foregroundStyle(theme.primaryText)
+                    .foregroundStyle(selected ? theme.pickerSelectedText : theme.primaryText)
                 Spacer()
                 if selected {
                     Image(systemName: "checkmark")
@@ -213,6 +218,8 @@ struct IndicatorTab: View {
                 }
             }
             .padding(.vertical, 8)
+            .padding(.horizontal, FlangSpacing.cardPadding)
+            .background(selected ? theme.pickerSelectedBackground : Color.clear)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
