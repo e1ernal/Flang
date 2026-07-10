@@ -48,6 +48,13 @@ enum FlangRadius {
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
     static let heroIcon: CGFloat = field
+
+    /// macOS's own app-icon corner radius is ~22.37% of the canvas size (the
+    /// "squircle" ratio behind every Big Sur+ icon template). Applied to
+    /// `FlangAppIcon` so the logo mark reads as a proper app icon without
+    /// going through `NSApp.applicationIconImage`, which additionally bakes
+    /// in system padding around the art — shrinking it inside its frame.
+    static let appIconCornerRatio: CGFloat = 0.2237
 }
 
 /// Font combinations that repeat across Settings tabs and the First Launch
@@ -191,5 +198,22 @@ struct FlangSeparator: View {
 
     var body: some View {
         theme.separator.frame(height: 1)
+    }
+}
+
+/// The app's logo mark, drawn at `size` with macOS's own app-icon corner
+/// ratio. Uses the plain `AppLogo` image asset (edge-to-edge art, no system
+/// padding) rather than `NSApp.applicationIconImage` — that call applies the
+/// system's automatic squircle mask *and* a safe-area inset around the art,
+/// which left visible gaps inside the frame at every call site.
+struct FlangAppIcon: View {
+    let size: CGFloat
+
+    var body: some View {
+        Image("AppLogo")
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * FlangRadius.appIconCornerRatio, style: .continuous))
     }
 }

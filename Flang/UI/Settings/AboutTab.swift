@@ -24,10 +24,7 @@ struct AboutTab: View {
         VStack(spacing: 0) {
             Spacer()
 
-            Image("AppLogo")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: FlangSpacing.heroIconSize, height: FlangSpacing.heroIconSize)
+            FlangAppIcon(size: FlangSpacing.heroIconSize)
                 .padding(.bottom, 12)
 
             Text("Flang")

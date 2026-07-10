@@ -57,10 +57,7 @@ struct SettingsView: View {
     private var sidebar: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                Image("AppLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 32, height: 32)
+                FlangAppIcon(size: 32)
                 Text("Flang")
                     .font(FlangFont.sidebarApp)
                     .foregroundStyle(theme.primaryText)
