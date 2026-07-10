@@ -133,7 +133,9 @@ final class StatusItemController: NSObject {
     }
 
     private func setIndicator(_ button: NSStatusBarButton, image: NSImage?, title: String?, source: InputSource) {
-        image?.accessibilityDescription = source.name
+        // When a title is already shown, the image is decorative — clearing its
+        // description keeps VoiceOver from announcing the source name twice.
+        image?.accessibilityDescription = title == nil ? source.name : nil
         button.image = image
         button.title = title ?? ""
         button.toolTip = source.name
