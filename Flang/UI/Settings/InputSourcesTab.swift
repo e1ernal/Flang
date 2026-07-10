@@ -51,14 +51,19 @@ struct InputSourcesTab: View {
                 Spacer()
                 Button(action: openKeyboardSettings) {
                     Image(systemName: "plus")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(theme.sidebarItemText)
+                        .frame(width: FlangSpacing.iconButtonSize, height: FlangSpacing.iconButtonSize)
+                        .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(theme.secondaryText)
             }
-            .padding(.bottom, 6)
+            .padding(.bottom, 16)
 
-            Text("Customize how each input source appears.")
+            Text("""
+            Customize the flag, emoji and name shown for each input source you've added \
+            in System Settings. Tap + to add another.
+            """)
                 .font(FlangFont.sectionSubtitle)
                 .foregroundStyle(theme.secondaryText)
                 .padding(.bottom, 16)
@@ -69,23 +74,15 @@ struct InputSourcesTab: View {
             }
 
             ScrollView {
-                VStack(spacing: 8) {
-                    ForEach(filteredSources, id: \.id) { source in
-                        sourceCard(source)
+                VStack(spacing: 0) {
+                    ForEach(Array(filteredSources.enumerated()), id: \.element.id) { index, source in
+                        if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, FlangSpacing.cardPadding) }
+                        sourceEntry(source)
                     }
                 }
             }
+            .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
             .frame(maxHeight: 280)
-
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.counterclockwise")
-                    .foregroundStyle(theme.secondaryText)
-                    .font(FlangFont.captionSmall)
-                Text("Reset restores defaults. Delete removes the input source from the system.")
-                    .font(FlangFont.caption)
-                    .foregroundStyle(theme.secondaryText)
-            }
-            .padding(.top, 12)
 
             Spacer()
         }
@@ -143,19 +140,21 @@ struct InputSourcesTab: View {
         .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
-    // MARK: - Source card
+    // MARK: - Source entry
 
-    private func sourceCard(_ source: InputSource) -> some View {
+    private func sourceEntry(_ source: InputSource) -> some View {
         let isExpanded = expandedSources.contains(source.id)
         let custom = settings.customization(for: source.id)
-        return VStack(spacing: 0) {
+        return VStack(alignment: .leading, spacing: 0) {
             sourceRow(source, custom: custom, expanded: isExpanded)
+                .padding(.bottom, isExpanded ? FlangSpacing.cardPadding : 0)
             if isExpanded {
-                FlangSeparator(theme: theme).padding(.leading, 16)
                 expandedContent(source, custom: custom)
             }
         }
-        .flangCard(theme)
+        .padding(.horizontal, FlangSpacing.cardPadding)
+        .padding(.vertical, FlangSpacing.nestedPadding)
+        .background(isExpanded ? theme.rowHighlight : Color.clear)
     }
 
     private func sourceRow(_ source: InputSource, custom: SourceCustomization, expanded: Bool) -> some View {
@@ -174,6 +173,7 @@ struct InputSourcesTab: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 24, height: 16)
+                    .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(custom.fullName ?? source.name)
@@ -188,7 +188,6 @@ struct InputSourcesTab: View {
                     .font(FlangFont.chevron)
                     .foregroundStyle(theme.secondaryText)
             }
-            .padding(.vertical, 6)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -214,64 +213,88 @@ struct InputSourcesTab: View {
 
 extension InputSourcesTab {
     func expandedContent(_ source: InputSource, custom: SourceCustomization) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: FlangSpacing.nestedPadding) {
             flagSection(source, custom: custom)
             nameSection(source, custom: custom)
             actionSection(source, custom: custom)
+            footerNote
         }
-        .padding(.top, 8)
-        .padding(.bottom, 4)
+    }
+
+    private var footerNote: some View {
+        Text("""
+        Reset restores this source's flag, emoji and names to their system defaults. \
+        Delete removes the input source from the system entirely.
+        """)
+            .font(FlangFont.captionSmall)
+            .foregroundStyle(theme.secondaryText)
     }
 
     private func flagSection(_ source: InputSource, custom: SourceCustomization) -> some View {
-        VStack(spacing: 8) {
-            flagRow("Flag Image", code: custom.flagImageCode, source: source, mode: .images)
-            flagRow("Flag Emoji", code: custom.flagEmojiCode, source: source, mode: .emoji)
+        VStack(spacing: 0) {
+            flagRow("Flag", code: custom.flagImageCode, source: source, mode: .images)
+            FlangSeparator(theme: theme)
+            flagRow("Emoji", code: custom.flagEmojiCode, source: source, mode: .emoji)
         }
+        .padding(.horizontal, FlangSpacing.nestedPadding)
+        .background(theme.sectionBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     private func flagRow(_ label: String, code: String?, source: InputSource, mode: FlagStore.Mode) -> some View {
         let effectiveCode = code ?? flagStore.defaultCountryCode(for: source)
-        return HStack {
-            Text(label)
-                .font(FlangFont.caption)
-                .foregroundStyle(theme.secondaryText)
-            Spacer()
-            if let effectiveCode, let image = flagStore.image(forCode: effectiveCode, mode: mode, height: 14) {
-                Image(nsImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 14)
+        return Button {
+            flagPicker = FlagPickerContext(sourceID: source.id, mode: mode)
+        } label: {
+            HStack {
+                Text(label)
+                    .font(FlangFont.sectionSubtitle)
+                    .foregroundStyle(theme.secondaryText)
+                Spacer()
+                HStack(spacing: 7) {
+                    if let effectiveCode, let image = flagStore.image(forCode: effectiveCode, mode: mode, height: 12) {
+                        Image(nsImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 12)
+                            .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
+                    }
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 8, weight: .semibold))
+                        .foregroundStyle(theme.chipChevron)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
             }
-            Button("Change…") {
-                flagPicker = FlagPickerContext(sourceID: source.id, mode: mode)
-            }
-            .font(FlangFont.caption)
-            .buttonStyle(.plain)
-            .foregroundStyle(theme.accent)
+            .padding(.vertical, FlangSpacing.nestedPadding)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private func nameSection(_ source: InputSource, custom: SourceCustomization) -> some View {
-        VStack(spacing: 8) {
-            nameRow("Full Name", value: custom.fullName ?? source.name) { newValue in
+        VStack(spacing: 0) {
+            nameRow("Full name", value: custom.fullName ?? source.name) { newValue in
                 var updated = custom
                 updated.fullName = newValue == source.name ? nil : newValue
                 settings.setCustomization(updated, for: source.id)
             }
-            nameRow("Short Name", value: custom.shortName ?? source.shortName) { newValue in
+            FlangSeparator(theme: theme)
+            nameRow("Short name", value: custom.shortName ?? source.shortName) { newValue in
                 var updated = custom
                 let trimmed = String(newValue.prefix(8))
                 updated.shortName = trimmed == source.shortName ? nil : trimmed
                 settings.setCustomization(updated, for: source.id)
             }
         }
+        .padding(.horizontal, FlangSpacing.nestedPadding)
+        .background(theme.sectionBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     private func nameRow(_ label: String, value: String, onCommit: @escaping (String) -> Void) -> some View {
         HStack {
             Text(label)
-                .font(FlangFont.caption)
+                .font(FlangFont.sectionSubtitle)
                 .foregroundStyle(theme.secondaryText)
             Spacer()
             TextField("", text: Binding(
@@ -279,11 +302,12 @@ extension InputSourcesTab {
                 set: { onCommit($0) }
             ))
             .textFieldStyle(.plain)
-            .font(FlangFont.caption)
+            .font(FlangFont.sectionSubtitle)
             .foregroundStyle(theme.primaryText)
             .frame(maxWidth: 160)
             .multilineTextAlignment(.trailing)
         }
+        .padding(.vertical, FlangSpacing.nestedPadding)
     }
 
     private func actionSection(_ source: InputSource, custom: SourceCustomization) -> some View {
@@ -292,7 +316,7 @@ extension InputSourcesTab {
                 Button("Reset") {
                     resetConfirmSource = source
                 }
-                .font(FlangFont.caption)
+                .font(FlangFont.sectionSubtitle)
                 .buttonStyle(.plain)
                 .foregroundStyle(theme.accent)
             }
@@ -302,9 +326,12 @@ extension InputSourcesTab {
             Button("Delete…") {
                 openKeyboardSettings()
             }
-            .font(FlangFont.caption)
+            .font(FlangFont.sectionSubtitle)
             .buttonStyle(.plain)
             .foregroundStyle(theme.destructive)
         }
+        .padding(.horizontal, FlangSpacing.nestedPadding)
+        .padding(.vertical, FlangSpacing.nestedPadding)
+        .background(theme.sectionBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 }

@@ -35,6 +35,15 @@ enum FlangSpacing {
     static let sidebarPadding: CGFloat = 8
     static let sidebarPaddingBottom: CGFloat = 16
     static let sidebarHeaderGap: CGFloat = 16
+
+    /// Inner inset for a box nested inside a card row — smaller than the
+    /// outer `cardPadding` so nested content reads as a distinct, tighter
+    /// group (e.g. the Flag/Emoji/Reset boxes inside an expanded Input
+    /// Source row).
+    static let nestedPadding: CGFloat = 8
+
+    /// Square icon-only control (e.g. the "+" add-source button).
+    static let iconButtonSize: CGFloat = 24
 }
 
 /// Two independent radius scales: `card`/`sidebarItem`/`field` for the
@@ -174,6 +183,20 @@ struct FlangColor {
     /// Dropdown pill's chevron glyph — dimmer still, matching the mockup.
     var chipChevron: Color {
         isDark ? Color.white.opacity(0.35) : Color.black.opacity(0.3)
+    }
+
+    /// Highlight tint behind an expanded Input Source row, distinguishing it
+    /// from its collapsed siblings in the same list.
+    var rowHighlight: Color {
+        isDark ? Color.white.opacity(0.05) : Color.black.opacity(0.02)
+    }
+
+    /// Background of the inset mini-groups inside an expanded Input Source
+    /// row (Flag+Emoji / Full+Short name / Reset+Delete) — a stronger
+    /// overlay than `tipBackground`, needed for contrast against the row's
+    /// own subtle highlight tint.
+    var sectionBackground: Color {
+        isDark ? Color.black.opacity(0.2) : Color.black.opacity(0.035)
     }
 
     var accent: Color {
