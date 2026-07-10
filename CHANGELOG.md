@@ -4,7 +4,7 @@ All notable changes to Flang are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [semver](https://semver.org/).
 
-## [1.0.0] — Unreleased
+## [1.0.0] — 2026-07-10
 
 First public release.
 
