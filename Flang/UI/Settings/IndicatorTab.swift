@@ -63,7 +63,7 @@ struct IndicatorTab: View {
         }
     }
 
-    private func settingRow(_ label: String, value: String, action: @escaping () -> Void) -> some View {
+    private func settingRow(_ label: LocalizedStringKey, value: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 Text(label)

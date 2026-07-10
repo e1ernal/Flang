@@ -128,11 +128,13 @@ struct AboutTab: View {
     }
 
     private var lastCheckedText: String {
-        guard let date = settings.lastUpdateCheck else { return "Never checked" }
+        guard let date = settings.lastUpdateCheck else {
+            return String(localized: "Never checked")
+        }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
-        return "Last checked: \(formatter.string(from: date))"
+        return String(localized: "Last checked: \(formatter.string(from: date))")
     }
 
     // MARK: - Footer links
@@ -154,7 +156,7 @@ struct AboutTab: View {
         }
     }
 
-    private func footerLink(_ title: String, action: @escaping () -> Void) -> some View {
+    private func footerLink(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(FlangFont.label)
