@@ -30,9 +30,9 @@ final class SettingsStore: ObservableObject {
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .image: return "Image"
-            case .emoji: return "Emoji"
-            case .none: return "None"
+            case .image: return String(localized: "Image")
+            case .emoji: return String(localized: "Emoji")
+            case .none: return String(localized: "None")
             }
         }
     }
@@ -43,9 +43,9 @@ final class SettingsStore: ObservableObject {
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .short: return "Short"
-            case .full: return "Full"
-            case .none: return "None"
+            case .short: return String(localized: "Short")
+            case .full: return String(localized: "Full")
+            case .none: return String(localized: "None")
             }
         }
     }
@@ -59,6 +59,7 @@ final class SettingsStore: ObservableObject {
     private let hasLaunchedKey = "HasLaunchedBefore"
     private let autoCheckForUpdatesKey = "AutoCheckForUpdates"
     private let lastUpdateCheckKey = "LastUpdateCheck"
+    private let interfaceLanguageKey = "InterfaceLanguage"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -95,6 +96,22 @@ final class SettingsStore: ObservableObject {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {}
+        }
+    }
+
+    // MARK: - Interface Language (FR-12)
+
+    /// "system" (follow macOS) or a supported language code ("en", "ru"). Applying
+    /// a change only takes effect on next launch — `AppleLanguages` is read by
+    /// Foundation once at process start, so the UI layer prompts for a relaunch.
+    @Published var interfaceLanguage: String = "system" {
+        didSet {
+            defaults.set(interfaceLanguage, forKey: interfaceLanguageKey)
+            if interfaceLanguage == "system" {
+                UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+            } else {
+                UserDefaults.standard.set([interfaceLanguage], forKey: "AppleLanguages")
+            }
         }
     }
 
@@ -172,5 +189,6 @@ final class SettingsStore: ObservableObject {
         nameSetting = defaults.string(forKey: nameKey).flatMap(NameSetting.init) ?? .none
         autoCheckForUpdates = defaults.object(forKey: autoCheckForUpdatesKey) as? Bool ?? true
         lastUpdateCheck = defaults.object(forKey: lastUpdateCheckKey) as? Date
+        interfaceLanguage = defaults.string(forKey: interfaceLanguageKey) ?? "system"
     }
 }
