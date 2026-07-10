@@ -31,6 +31,16 @@ final class StatusItemController: NSObject {
         max(FlagRenderer.menuHeight, NSStatusBar.system.thickness - 4)
     }
 
+    /// Whether the menu bar is currently rendering in a dark appearance — used to
+    /// pick a contrasting badge color for the "System" indicator style (FR-3).
+    /// Read from the status item's own button rather than `NSApp.effectiveAppearance`,
+    /// since the menu bar can differ from the app's own appearance ("Auto" menu
+    /// bar tinting tied to the desktop picture).
+    private var isMenuBarDark: Bool {
+        let appearance = statusItem.button?.effectiveAppearance ?? NSApp.effectiveAppearance
+        return appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    }
+
     init(manager: InputSourceManager, settings: SettingsStore) {
         self.manager = manager
         self.settings = settings
@@ -108,7 +118,7 @@ final class StatusItemController: NSObject {
         let name = nameText(for: source)
 
         if flag == nil && name == nil {
-            let icon = flagStore.systemIcon(for: source, height: indicatorHeight)
+            let icon = flagStore.systemIcon(for: source, height: indicatorHeight, dark: isMenuBarDark)
             setIndicator(button, image: icon, title: icon == nil ? source.shortName : nil, source: source)
         } else {
             setIndicator(button, image: flag, title: name, source: source)
