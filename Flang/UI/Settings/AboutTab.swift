@@ -145,7 +145,7 @@ struct AboutTab: View {
             Spacer()
             HStack(spacing: FlangSpacing.cardPadding) {
                 footerLink("Acknowledgements") { showAcknowledgements = true }
-                footerLink("Report a Bug") { openURL("https://github.com/e1ernal/Flang/issues/new") }
+                footerLink("Report a Bug") { openURL(reportBugURL) }
                 footerLink("GitHub") { openURL("https://github.com/e1ernal/Flang") }
             }
         }
@@ -184,5 +184,21 @@ struct AboutTab: View {
     private func openURL(_ string: String) {
         guard let url = URL(string: string) else { return }
         NSWorkspace.shared.open(url)
+    }
+
+    /// New GitHub Issue pre-filled with app + macOS version (FR-15) — shown to the
+    /// user in the browser before submitting, so they can edit or delete it.
+    private var reportBugURL: String {
+        let body = """
+        **App version:** \(version) (\(build))
+        **macOS version:** \(ProcessInfo.processInfo.operatingSystemVersionString)
+
+        ---
+
+        Describe the problem:
+        """
+        var components = URLComponents(string: "https://github.com/e1ernal/Flang/issues/new")
+        components?.queryItems = [URLQueryItem(name: "body", value: body)]
+        return components?.url?.absoluteString ?? "https://github.com/e1ernal/Flang/issues/new"
     }
 }
