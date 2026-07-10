@@ -118,6 +118,10 @@ struct AboutTab: View {
                             .foregroundStyle(theme.accent)
                     }
                     .buttonStyle(.plain)
+                } else if let error = updateChecker.lastError {
+                    Text(error)
+                        .font(FlangFont.caption)
+                        .foregroundStyle(theme.destructive)
                 }
             }
         }

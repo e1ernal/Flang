@@ -57,16 +57,32 @@ final class UpdateChecker: ObservableObject {
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 
         do {
-            let (data, _) = try await session.data(for: request)
-            let payload = try JSONDecoder().decode(GitHubRelease.self, from: data)
-            let latestVersion = payload.tagName.hasPrefix("v") ? String(payload.tagName.dropFirst()) : payload.tagName
-            if latestVersion.isNewer(than: currentVersion), let releaseURL = URL(string: payload.htmlURL) {
-                newerRelease = Release(version: latestVersion, url: releaseURL)
-            } else {
+            let (data, response) = try await session.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                lastError = "Couldn't reach GitHub."
+                settings.lastUpdateCheck = Date()
+                return
+            }
+
+            switch http.statusCode {
+            case 404:
+                // No release has been published yet (e.g. before v1.0 ships) —
+                // an expected state, not a failure worth alarming the user about.
                 newerRelease = nil
+            case 200...299:
+                let payload = try JSONDecoder().decode(GitHubRelease.self, from: data)
+                let tag = payload.tagName
+                let latestVersion = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
+                if latestVersion.isNewer(than: currentVersion), let releaseURL = URL(string: payload.htmlURL) {
+                    newerRelease = Release(version: latestVersion, url: releaseURL)
+                } else {
+                    newerRelease = nil
+                }
+            default:
+                lastError = "GitHub returned an error (HTTP \(http.statusCode))."
             }
         } catch {
-            lastError = error.localizedDescription
+            lastError = "Couldn't check for updates."
         }
         settings.lastUpdateCheck = Date()
     }
