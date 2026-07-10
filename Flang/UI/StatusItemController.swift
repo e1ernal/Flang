@@ -18,9 +18,8 @@ final class StatusItemController: NSObject {
     /// Called when the user picks "Settings…" from the right-click menu.
     var onOpenSettings: (() -> Void)?
 
-    /// Palette input sources activated for the parity menu items.
+    /// Palette input source activated for the Keyboard Viewer parity item.
     private let keyboardViewerID = "com.apple.KeyboardViewer"
-    private let characterPaletteID = "com.apple.CharacterPaletteIM"
 
     /// Longest full-name text shown in the indicator before it is ellipsized
     /// (SPEC section 5: cap the indicator width).
@@ -84,13 +83,6 @@ final class StatusItemController: NSObject {
 
     @objc private func openSettings() {
         onOpenSettings?()
-    }
-
-    @objc private func showEmojiSymbols() {
-        // As an accessory-policy app (no Dock icon), the palette can silently
-        // fail to become visible unless the app is explicitly activated first.
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.orderFrontCharacterPalette(self)
     }
 
     @objc private func showKeyboardViewer() {
@@ -186,13 +178,6 @@ final class StatusItemController: NSObject {
         }
 
         menu.addItem(.separator())
-        if manager.isSourceEnabled(id: characterPaletteID) {
-            menu.addItem(makeActionItem(
-                "Show Emoji & Symbols",
-                #selector(showEmojiSymbols),
-                icon: parityIcon(sourceID: characterPaletteID)
-            ))
-        }
         if manager.isSourceAvailable(id: keyboardViewerID) {
             menu.addItem(makeActionItem(
                 "Show Keyboard Viewer",
