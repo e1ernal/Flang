@@ -13,6 +13,9 @@ struct GeneralTab: View {
 
     @State private var showLanguagePicker = false
 
+    @Environment(\.colorScheme) private var scheme
+    private var theme: FlangColor { FlangColor(scheme) }
+
     private let languages: [(code: String, name: String)] = [
         ("system", "System Default"),
         ("en", "English"),
@@ -27,7 +30,8 @@ struct GeneralTab: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("General")
-                .font(.system(size: 22, weight: .bold))
+                .font(FlangFont.screenTitle)
+                .foregroundStyle(theme.primaryText)
                 .padding(.bottom, 20)
 
             if showLanguagePicker {
@@ -38,8 +42,8 @@ struct GeneralTab: View {
 
             Spacer()
         }
-        .padding(.top, 44)
-        .padding(.horizontal, 32)
+        .padding(.top, FlangSpacing.screenTop)
+        .padding(.horizontal, FlangSpacing.screenSides)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -47,40 +51,41 @@ struct GeneralTab: View {
 
     private var mainContent: some View {
         VStack(spacing: 16) {
-            card {
-                Toggle("Launch at Login", isOn: Binding(
-                    get: { settings.launchAtLogin },
-                    set: { settings.launchAtLogin = $0 }
-                ))
-                .font(.system(size: 13))
-            }
+            Toggle("Launch at Login", isOn: Binding(
+                get: { settings.launchAtLogin },
+                set: { settings.launchAtLogin = $0 }
+            ))
+            .font(FlangFont.label)
+            .foregroundStyle(theme.primaryText)
+            .tint(theme.toggleOn)
+            .flangCard(theme)
 
-            card {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) { showLanguagePicker = true }
-                } label: {
-                    HStack {
-                        Text("Interface Language")
-                            .font(.system(size: 13))
-                        Spacer()
-                        Text("English")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                    }
+            Button {
+                withAnimation(FlangMotion.tabTransition) { showLanguagePicker = true }
+            } label: {
+                HStack {
+                    Text("Interface Language")
+                        .font(FlangFont.label)
+                        .foregroundStyle(theme.primaryText)
+                    Spacer()
+                    Text("English")
+                        .font(FlangFont.label)
+                        .foregroundStyle(theme.secondaryText)
+                    Image(systemName: "chevron.right")
+                        .font(FlangFont.chevron)
+                        .foregroundStyle(theme.secondaryText)
                 }
-                .buttonStyle(.plain)
             }
+            .buttonStyle(.plain)
+            .flangCard(theme)
 
             HStack(spacing: 6) {
                 Image(systemName: "hand.point.up.left")
-                    .foregroundStyle(.secondary)
-                    .font(.system(size: 11))
+                    .foregroundStyle(theme.secondaryText)
+                    .font(FlangFont.captionSmall)
                 Text("Right-click the flag in your menu bar to jump straight into these settings.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .font(FlangFont.caption)
+                    .foregroundStyle(theme.secondaryText)
             }
             .padding(.top, 4)
         }
@@ -91,52 +96,43 @@ struct GeneralTab: View {
     private var languagePickerView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Button {
-                withAnimation(.easeInOut(duration: 0.2)) { showLanguagePicker = false }
+                withAnimation(FlangMotion.tabTransition) { showLanguagePicker = false }
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(FlangFont.chevron)
                     Text("General")
-                        .font(.system(size: 13))
+                        .font(FlangFont.label)
                 }
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(theme.secondaryText)
 
-            card {
-                VStack(spacing: 0) {
-                    ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
-                        if index > 0 {
-                            Divider().padding(.leading, 16)
-                        }
-                        HStack {
-                            Text(lang.name)
-                                .font(.system(size: 13))
-                            Spacer()
-                            if lang.code == "en" {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(Color.accentColor)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .contentShape(Rectangle())
+            VStack(spacing: 0) {
+                ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
+                    if index > 0 {
+                        FlangSeparator(theme: theme).padding(.leading, 16)
                     }
+                    HStack {
+                        Text(lang.name)
+                            .font(FlangFont.label)
+                            .foregroundStyle(theme.primaryText)
+                        Spacer()
+                        if lang.code == "en" {
+                            Image(systemName: "checkmark")
+                                .font(FlangFont.chevron)
+                                .foregroundStyle(theme.accent)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
                 }
             }
+            .flangCard(theme)
 
             Text("Translations are added in a future update.")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .font(FlangFont.caption)
+                .foregroundStyle(theme.secondaryText)
         }
-    }
-
-    // MARK: - Card wrapper
-
-    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        content()
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 }

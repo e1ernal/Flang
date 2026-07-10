@@ -37,8 +37,9 @@ final class SettingsWindowController {
         )
         let hostingView = NSHostingView(rootView: settingsView)
 
+        let size = FlangSpacing.settingsWindowSize
         let newWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 640, height: 420),
+            contentRect: NSRect(x: 0, y: 0, width: size.width, height: size.height),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false

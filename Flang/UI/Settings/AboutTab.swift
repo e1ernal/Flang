@@ -9,6 +9,9 @@ import SwiftUI
 
 /// About tab: version, links, license, attribution (FR-8).
 struct AboutTab: View {
+    @Environment(\.colorScheme) private var scheme
+    private var theme: FlangColor { FlangColor(scheme) }
+
     private var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     }
@@ -27,12 +30,13 @@ struct AboutTab: View {
                 .padding(.bottom, 12)
 
             Text("Flang")
-                .font(.system(size: 22, weight: .bold))
+                .font(FlangFont.screenTitle)
+                .foregroundStyle(theme.primaryText)
                 .padding(.bottom, 4)
 
             Text("Version \(version) (\(build))")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .font(FlangFont.caption)
+                .foregroundStyle(theme.secondaryText)
                 .padding(.bottom, 20)
 
             VStack(spacing: 8) {
@@ -50,11 +54,11 @@ struct AboutTab: View {
 
             VStack(spacing: 4) {
                 Text("MIT License")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .font(FlangFont.captionSmall)
+                    .foregroundStyle(theme.secondaryText)
                 Text("Flag icons by flag-icons")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .font(FlangFont.captionSmall)
+                    .foregroundStyle(theme.secondaryText)
             }
 
             Spacer()
@@ -69,10 +73,11 @@ struct AboutTab: View {
                     .frame(width: 14)
                 Text(title)
             }
-            .font(.system(size: 13))
+            .font(FlangFont.label)
+            .foregroundStyle(theme.primaryText)
             .frame(width: 200)
             .padding(.vertical, 6)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+            .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
         }
         .buttonStyle(.plain)
         .disabled(!enabled)

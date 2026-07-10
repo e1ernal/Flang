@@ -18,6 +18,9 @@ struct InputSourcesTab: View {
     @State private var flagPicker: FlagPickerContext?
     @State private var resetConfirmSource: InputSource?
 
+    @Environment(\.colorScheme) private var scheme
+    var theme: FlangColor { FlangColor(scheme) }
+
     struct FlagPickerContext: Identifiable {
         let sourceID: String
         let mode: FlagStore.Mode
@@ -43,20 +46,21 @@ struct InputSourcesTab: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Input Sources")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(FlangFont.screenTitle)
+                    .foregroundStyle(theme.primaryText)
                 Spacer()
                 Button(action: openKeyboardSettings) {
                     Image(systemName: "plus")
                         .font(.system(size: 13, weight: .semibold))
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(theme.secondaryText)
             }
             .padding(.bottom, 6)
 
             Text("Customize how each input source appears.")
-                .font(.system(size: 12.5))
-                .foregroundStyle(.secondary)
+                .font(FlangFont.sectionSubtitle)
+                .foregroundStyle(theme.secondaryText)
                 .padding(.bottom, 16)
 
             if sources.count >= 10 {
@@ -75,18 +79,18 @@ struct InputSourcesTab: View {
 
             HStack(spacing: 6) {
                 Image(systemName: "arrow.counterclockwise")
-                    .foregroundStyle(.secondary)
-                    .font(.system(size: 11))
+                    .foregroundStyle(theme.secondaryText)
+                    .font(FlangFont.captionSmall)
                 Text("Reset restores defaults. Delete removes the input source from the system.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .font(FlangFont.caption)
+                    .foregroundStyle(theme.secondaryText)
             }
             .padding(.top, 12)
 
             Spacer()
         }
-        .padding(.top, 44)
-        .padding(.horizontal, 32)
+        .padding(.top, FlangSpacing.screenTop)
+        .padding(.horizontal, FlangSpacing.screenSides)
         .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(item: $flagPicker) { context in
             FlagPickerSheet(
@@ -127,15 +131,16 @@ struct InputSourcesTab: View {
     private var searchField: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-                .font(.system(size: 12))
+                .foregroundStyle(theme.secondaryText)
+                .font(FlangFont.caption)
             TextField("Search", text: $searchText)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13))
+                .font(FlangFont.label)
+                .foregroundStyle(theme.primaryText)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     // MARK: - Source card
@@ -143,20 +148,19 @@ struct InputSourcesTab: View {
     private func sourceCard(_ source: InputSource) -> some View {
         let isExpanded = expandedSources.contains(source.id)
         let custom = settings.customization(for: source.id)
-        return card {
-            VStack(spacing: 0) {
-                sourceRow(source, custom: custom, expanded: isExpanded)
-                if isExpanded {
-                    Divider().padding(.leading, 16)
-                    expandedContent(source, custom: custom)
-                }
+        return VStack(spacing: 0) {
+            sourceRow(source, custom: custom, expanded: isExpanded)
+            if isExpanded {
+                FlangSeparator(theme: theme).padding(.leading, 16)
+                expandedContent(source, custom: custom)
             }
         }
+        .flangCard(theme)
     }
 
     private func sourceRow(_ source: InputSource, custom: SourceCustomization, expanded: Bool) -> some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(FlangMotion.tabTransition) {
                 if expanded {
                     expandedSources.remove(source.id)
                 } else {
@@ -173,15 +177,16 @@ struct InputSourcesTab: View {
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(custom.fullName ?? source.name)
-                        .font(.system(size: 13))
+                        .font(FlangFont.label)
+                        .foregroundStyle(theme.primaryText)
                     Text(custom.shortName ?? source.shortName)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                        .font(FlangFont.captionSmall)
+                        .foregroundStyle(theme.secondaryText)
                 }
                 Spacer()
                 Image(systemName: expanded ? "chevron.down" : "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(FlangFont.chevron)
+                    .foregroundStyle(theme.secondaryText)
             }
             .padding(.vertical, 6)
             .contentShape(Rectangle())
@@ -202,13 +207,6 @@ struct InputSourcesTab: View {
     func openKeyboardSettings() {
         guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
         NSWorkspace.shared.open(url)
-    }
-
-    func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        content()
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -236,8 +234,8 @@ extension InputSourcesTab {
         let effectiveCode = code ?? flagStore.defaultCountryCode(for: source)
         return HStack {
             Text(label)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .font(FlangFont.caption)
+                .foregroundStyle(theme.secondaryText)
             Spacer()
             if let effectiveCode, let image = flagStore.image(forCode: effectiveCode, mode: mode, height: 14) {
                 Image(nsImage: image)
@@ -248,9 +246,9 @@ extension InputSourcesTab {
             Button("Change…") {
                 flagPicker = FlagPickerContext(sourceID: source.id, mode: mode)
             }
-            .font(.system(size: 12))
+            .font(FlangFont.caption)
             .buttonStyle(.plain)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(theme.accent)
         }
     }
 
@@ -273,15 +271,16 @@ extension InputSourcesTab {
     private func nameRow(_ label: String, value: String, onCommit: @escaping (String) -> Void) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .font(FlangFont.caption)
+                .foregroundStyle(theme.secondaryText)
             Spacer()
             TextField("", text: Binding(
                 get: { value },
                 set: { onCommit($0) }
             ))
             .textFieldStyle(.plain)
-            .font(.system(size: 12))
+            .font(FlangFont.caption)
+            .foregroundStyle(theme.primaryText)
             .frame(maxWidth: 160)
             .multilineTextAlignment(.trailing)
         }
@@ -293,9 +292,9 @@ extension InputSourcesTab {
                 Button("Reset") {
                     resetConfirmSource = source
                 }
-                .font(.system(size: 12))
+                .font(FlangFont.caption)
                 .buttonStyle(.plain)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(theme.accent)
             }
 
             Spacer()
@@ -303,9 +302,9 @@ extension InputSourcesTab {
             Button("Delete…") {
                 openKeyboardSettings()
             }
-            .font(.system(size: 12))
+            .font(FlangFont.caption)
             .buttonStyle(.plain)
-            .foregroundStyle(.red)
+            .foregroundStyle(theme.destructive)
         }
     }
 }

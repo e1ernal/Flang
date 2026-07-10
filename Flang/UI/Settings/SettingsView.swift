@@ -15,6 +15,9 @@ struct SettingsView: View {
 
     @State private var selection: Tab = .general
 
+    @Environment(\.colorScheme) private var scheme
+    private var theme: FlangColor { FlangColor(scheme) }
+
     enum Tab: String, CaseIterable, Identifiable {
         case general, indicator, inputSources, about
         var id: String { rawValue }
@@ -41,11 +44,12 @@ struct SettingsView: View {
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-            Divider()
+            theme.separator.frame(width: 1)
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(theme.windowBackground)
         }
-        .frame(width: 640, height: 420)
+        .frame(width: FlangSpacing.settingsWindowSize.width, height: FlangSpacing.settingsWindowSize.height)
     }
 
     // MARK: - Sidebar
@@ -57,7 +61,8 @@ struct SettingsView: View {
                     .resizable()
                     .frame(width: 32, height: 32)
                 Text("Flang")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(FlangFont.sidebarApp)
+                    .foregroundStyle(theme.primaryText)
             }
             .padding(.top, 26)
             .padding(.bottom, 20)
@@ -71,8 +76,8 @@ struct SettingsView: View {
 
             Spacer()
         }
-        .frame(width: 172)
-        .background(.ultraThinMaterial)
+        .frame(width: FlangSpacing.sidebarWidth)
+        .background(theme.sidebarBackground)
     }
 
     private func sidebarItem(_ tab: Tab) -> some View {
@@ -83,16 +88,16 @@ struct SettingsView: View {
                 Image(systemName: tab.icon)
                     .frame(width: 16)
                 Text(tab.label)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(FlangFont.sidebarItem)
                 Spacer()
             }
             .padding(.vertical, 7)
             .padding(.horizontal, 10)
             .background(
-                RoundedRectangle(cornerRadius: 7)
-                    .fill(selection == tab ? Color.accentColor : Color.clear)
+                RoundedRectangle(cornerRadius: FlangRadius.sidebarItem)
+                    .fill(selection == tab ? theme.sidebarSelection : Color.clear)
             )
-            .foregroundStyle(selection == tab ? .white : .primary)
+            .foregroundStyle(selection == tab ? theme.onAccent : theme.primaryText)
         }
         .buttonStyle(.plain)
     }

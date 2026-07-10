@@ -15,6 +15,9 @@ struct FlagPickerSheet: View {
     let onSelect: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var scheme
+    private var theme: FlangColor { FlangColor(scheme) }
+
     @State private var searchText = ""
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 6)
@@ -31,7 +34,7 @@ struct FlagPickerSheet: View {
             searchField
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-            Divider()
+            FlangSeparator(theme: theme)
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(filtered) { region in
@@ -42,16 +45,18 @@ struct FlagPickerSheet: View {
             }
         }
         .frame(width: 440, height: 380)
+        .background(theme.windowBackground)
     }
 
     private var header: some View {
         HStack {
             Text(mode == .images ? "Choose Flag Image" : "Choose Flag Emoji")
-                .font(.system(size: 15, weight: .semibold))
+                .font(FlangFont.sidebarApp)
+                .foregroundStyle(theme.primaryText)
             Spacer()
             Button("Cancel") { dismiss() }
                 .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(theme.secondaryText)
         }
         .padding(.horizontal, 16)
         .padding(.top, 14)
@@ -60,15 +65,16 @@ struct FlagPickerSheet: View {
     private var searchField: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-                .font(.system(size: 12))
+                .foregroundStyle(theme.secondaryText)
+                .font(FlangFont.caption)
             TextField("Search countries", text: $searchText)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13))
+                .font(FlangFont.label)
+                .foregroundStyle(theme.primaryText)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     private func flagCell(_ region: FlagStore.Region) -> some View {
@@ -85,15 +91,15 @@ struct FlagPickerSheet: View {
                         .frame(height: 20)
                 }
                 Text(region.name)
-                    .font(.system(size: 9))
+                    .font(FlangFont.tinyLabel)
                     .lineLimit(1)
-                    .foregroundStyle(isSelected ? Color.accentColor : .primary)
+                    .foregroundStyle(isSelected ? theme.accent : theme.primaryText)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
             .background(
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.clear)
+                RoundedRectangle(cornerRadius: FlangRadius.chip)
+                    .fill(isSelected ? theme.accent.opacity(0.12) : Color.clear)
             )
         }
         .buttonStyle(.plain)
