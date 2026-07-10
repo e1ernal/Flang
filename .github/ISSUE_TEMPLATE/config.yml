@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/e1ernal/Flang/discussions
+    about: For questions or open-ended ideas, use Discussions instead of an issue.

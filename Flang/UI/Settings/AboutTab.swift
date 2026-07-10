@@ -189,18 +189,16 @@ struct AboutTab: View {
     }
 
     /// New GitHub Issue pre-filled with app + macOS version (FR-15) — shown to the
-    /// user in the browser before submitting, so they can edit or delete it.
+    /// user in the browser before submitting, so they can edit or delete it. Targets
+    /// the Bug report issue form (.github/ISSUE_TEMPLATE/bug_report.yml) and fills
+    /// its "app-version"/"macos-version" fields by their query-param IDs.
     private var reportBugURL: String {
-        let body = """
-        **App version:** \(version) (\(build))
-        **macOS version:** \(ProcessInfo.processInfo.operatingSystemVersionString)
-
-        ---
-
-        Describe the problem:
-        """
         var components = URLComponents(string: "https://github.com/e1ernal/Flang/issues/new")
-        components?.queryItems = [URLQueryItem(name: "body", value: body)]
+        components?.queryItems = [
+            URLQueryItem(name: "template", value: "bug_report.yml"),
+            URLQueryItem(name: "app-version", value: "\(version) (\(build))"),
+            URLQueryItem(name: "macos-version", value: ProcessInfo.processInfo.operatingSystemVersionString)
+        ]
         return components?.url?.absoluteString ?? "https://github.com/e1ernal/Flang/issues/new"
     }
 }
