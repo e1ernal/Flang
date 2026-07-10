@@ -58,7 +58,10 @@ protocol InputSourceMonitoring: AnyObject {
 }
 
 /// The only place in the app that talks to the Carbon Text Input Sources (TIS) API.
-final class InputSourceManager {
+/// `ObservableObject` so SwiftUI views (the Settings window) can refresh their
+/// source list live, alongside the `InputSourceMonitoring` delegate used by the
+/// AppKit menu.
+final class InputSourceManager: ObservableObject {
     weak var delegate: InputSourceMonitoring?
 
     private let notificationCenter: CFNotificationCenter
@@ -127,12 +130,6 @@ final class InputSourceManager {
         }
     }
 
-    /// Whether an enabled input source with this id exists. Used to gate menu items
-    /// whose mechanism is unavailable (FR-2 degradation rule).
-    func isSourceEnabled(id: String) -> Bool {
-        enabledSource(id: id) != nil
-    }
-
     /// Whether an installed (not necessarily enabled) source exists. Uses a filtered
     /// `TISCreateInputSourceList` with a specific ID — unlike the unfiltered
     /// `(nil, true)` call this does NOT re-enable all installed sources. Used to
@@ -142,8 +139,7 @@ final class InputSourceManager {
         installedSource(id: id) != nil
     }
 
-    /// Activate an enabled source by id — used for palette sources like the Character
-    /// Viewer (`com.apple.CharacterPaletteIM`).
+    /// Activate an enabled source by id — used for the Keyboard Viewer palette source.
     func activateSource(id: String) {
         guard let source = enabledSource(id: id) ?? installedSource(id: id) else { return }
         let status = TISSelectInputSource(source)
@@ -174,8 +170,8 @@ final class InputSourceManager {
         return list.first
     }
 
-    /// The system icon of an enabled or installed source (e.g. the Character Viewer
-    /// palette or Keyboard Viewer), used to give parity menu items their icon (FR-2).
+    /// The system icon of an enabled or installed source (e.g. the Keyboard Viewer
+    /// palette), used to give parity menu items their icon (FR-2).
     func icon(forSourceID id: String) -> NSImage? {
         guard let source = enabledSource(id: id) ?? installedSource(id: id),
               let url = source.iconImageURL else { return nil }
@@ -194,6 +190,22 @@ final class InputSourceManager {
         )
     }
 
+    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` can arrive slightly before
+    /// TIS's own enabled-sources list actually reflects an add/remove made in
+    /// System Settings — `TISCreateInputSourceList` briefly keeps returning the
+    /// old set. Re-check shortly after the first notification so a just-deleted
+    /// source doesn't linger in the menu/Settings list until something else
+    /// happens to trigger a re-query.
+    private func notifyEnabledSourcesChanged() {
+        delegate?.enabledInputSourcesDidChange()
+        objectWillChange.send()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            self.delegate?.enabledInputSourcesDidChange()
+            self.objectWillChange.send()
+        }
+    }
+
     private func registerForNotifications() {
         let observer = Unmanaged.passUnretained(self).toOpaque()
         let selected = kTISNotifySelectedKeyboardInputSourceChanged as String
@@ -205,8 +217,9 @@ final class InputSourceManager {
             DispatchQueue.main.async {
                 if rawName == (kTISNotifySelectedKeyboardInputSourceChanged as String) {
                     manager.delegate?.selectedInputSourceDidChange()
+                    manager.objectWillChange.send()
                 } else if rawName == (kTISNotifyEnabledKeyboardInputSourcesChanged as String) {
-                    manager.delegate?.enabledInputSourcesDidChange()
+                    manager.notifyEnabledSourcesChanged()
                 }
             }
         }

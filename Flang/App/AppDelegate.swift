@@ -10,9 +10,41 @@ import AppKit
 /// Application lifecycle only. All menu bar UI lives in `StatusItemController`.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let inputSourceManager = InputSourceManager()
+    private let settings = SettingsStore()
+    private let updateChecker = UpdateChecker()
     private var statusItemController: StatusItemController?
+    private var settingsWindowController: SettingsWindowController?
+    private var firstLaunchWindowController: FirstLaunchWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItemController = StatusItemController(manager: inputSourceManager)
+        settings.load()
+        let controller = StatusItemController(
+            manager: inputSourceManager,
+            settings: settings
+        )
+        statusItemController = controller
+        settingsWindowController = SettingsWindowController(
+            settings: settings,
+            flagStore: controller.flagStore,
+            manager: inputSourceManager,
+            updateChecker: updateChecker
+        )
+        controller.onOpenSettings = { [weak self] in
+            self?.settingsWindowController?.showWindow()
+        }
+
+        if !settings.hasLaunchedBefore {
+            settings.launchAtLogin = true
+            firstLaunchWindowController = FirstLaunchWindowController()
+            // Only mark the first launch as done once the user taps "Get Started",
+            // so closing or quitting beforehand keeps the welcome coming back.
+            firstLaunchWindowController?.showWindow { [weak self] in
+                self?.settings.markAsLaunched()
+            }
+        }
+
+        Task { [settings, updateChecker] in
+            await updateChecker.checkIfDue(settings: settings)
+        }
     }
 }
