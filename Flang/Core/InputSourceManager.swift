@@ -69,6 +69,7 @@ final class InputSourceManager: ObservableObject {
     init() {
         notificationCenter = CFNotificationCenterGetDistributedCenter()
         registerForNotifications()
+        registerForActivationRefresh()
     }
 
     deinit {
@@ -195,14 +196,34 @@ final class InputSourceManager: ObservableObject {
     /// System Settings — `TISCreateInputSourceList` briefly keeps returning the
     /// old set. Re-check shortly after the first notification so a just-deleted
     /// source doesn't linger in the menu/Settings list until something else
-    /// happens to trigger a re-query.
+    /// happens to trigger a re-query. Deleting a source outright (as opposed to
+    /// just disabling one) seems to settle slower than the enable/disable case
+    /// this was first written for, hence the second, later retry.
     private func notifyEnabledSourcesChanged() {
         delegate?.enabledInputSourcesDidChange()
         objectWillChange.send()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self else { return }
-            self.delegate?.enabledInputSourcesDidChange()
-            self.objectWillChange.send()
+        for delay in [0.3, 1.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self else { return }
+                self.delegate?.enabledInputSourcesDidChange()
+                self.objectWillChange.send()
+            }
+        }
+    }
+
+    /// TIS notifications aren't reliably posted for every kind of System
+    /// Settings change — deleting a source outright doesn't seem to trigger
+    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` the way disabling one
+    /// does. Refresh whenever Flang regains focus too, since the common flow
+    /// is "make the change in System Settings, switch back to Flang" — a
+    /// signal that doesn't depend on TIS posting anything at all.
+    private func registerForActivationRefresh() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.notifyEnabledSourcesChanged()
         }
     }
 

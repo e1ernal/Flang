@@ -110,9 +110,9 @@ final class FlagStore {
         return FlagRenderer.globe(height: height)
     }
 
-    func systemIcon(for source: InputSource, height: CGFloat) -> NSImage? {
+    func systemIcon(for source: InputSource, height: CGFloat, dark: Bool) -> NSImage? {
         guard let icon = loadSystemIcon(for: source) else { return nil }
-        return FlagRenderer.icon(icon, height: height, template: false)
+        return FlagRenderer.systemIconBadge(icon, height: height, dark: dark)
     }
 
     private func loadSystemIcon(for source: InputSource) -> NSImage? {
@@ -187,6 +187,42 @@ enum FlagRenderer {
         defer { output.unlockFocus() }
         icon.draw(in: NSRect(origin: .zero, size: size))
         output.isTemplate = template
+        return output
+    }
+
+    /// Wraps a source's own system icon in a rounded badge, the way macOS's own
+    /// input switcher presents it (FR-3 "System" style). The icon alone is often
+    /// a near-black monochrome glyph on a transparent background — without a
+    /// badge behind it, it reads as an invisible smudge on a dark menu bar.
+    static func systemIconBadge(_ icon: NSImage, height: CGFloat, dark: Bool) -> NSImage {
+        let size = NSSize(width: height, height: height)
+        let output = NSImage(size: size)
+        output.lockFocus()
+        defer { output.unlockFocus() }
+
+        let badgeColor: NSColor = dark ? .white : .black
+        let glyphColor: NSColor = dark ? .black : .white
+
+        let badgeRect = NSRect(origin: .zero, size: size)
+        // Same ~22% "squircle" ratio as FlangAppIcon (UI/DesignSystem.swift) —
+        // duplicated rather than imported so Core stays free of UI dependencies.
+        let radius = height * 0.2237
+        badgeColor.setFill()
+        NSBezierPath(roundedRect: badgeRect, xRadius: radius, yRadius: radius).fill()
+
+        let inset = height * 0.18
+        let glyphRect = badgeRect.insetBy(dx: inset, dy: inset)
+        icon.draw(in: glyphRect, from: .zero, operation: .sourceOver, fraction: 1)
+
+        // Tint just the glyph's opaque pixels: draw a flat fill through the alpha
+        // mask the icon itself just left behind, rather than assuming its source
+        // color — the icon may not already be pure black.
+        NSGraphicsContext.current?.compositingOperation = .sourceAtop
+        glyphColor.setFill()
+        glyphRect.fill()
+        NSGraphicsContext.current?.compositingOperation = .sourceOver
+
+        output.isTemplate = false
         return output
     }
 
