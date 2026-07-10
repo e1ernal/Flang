@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Build a distributable DMG for Flang: builds the app in Release configuration,
-# then packages it into a "drag Flang.app into Applications" DMG via create-dmg.
+# then packages it into a "drag Flang.app into Applications" DMG via dmgbuild.
 #
 # The build is unsigned beyond the project's default ad-hoc signing — this
 # project has no Apple Developer Program membership yet (see _local/SPEC.md
@@ -9,7 +9,12 @@
 # developer" warning on first launch; README documents the one-time
 # right-click-Open workaround.
 #
-# Requires: create-dmg (brew install create-dmg).
+# Uses dmgbuild (not create-dmg): create-dmg positions the Finder icons via
+# AppleScript, which needs an interactive "allow this app to control Finder"
+# permission prompt — a dead end in any non-interactive/headless context.
+# dmgbuild writes the .DS_Store layout directly, no Finder automation needed.
+#
+# Requires: dmgbuild (pip3 install --user dmgbuild).
 #
 # Usage:
 #   Scripts/make-dmg.sh
@@ -18,8 +23,8 @@
 #
 set -euo pipefail
 
-if ! command -v create-dmg >/dev/null 2>&1; then
-  echo "error: create-dmg not found. Install it with: brew install create-dmg" >&2
+if ! python3 -c "import dmgbuild" >/dev/null 2>&1; then
+  echo "error: dmgbuild not found. Install it with: pip3 install --user dmgbuild" >&2
   exit 1
 fi
 
@@ -47,15 +52,27 @@ VERSION="$(defaults read "$APP_PATH/Contents/Info" CFBundleShortVersionString)"
 DMG_PATH="$BUILD_DIR/Flang-$VERSION.dmg"
 rm -f "$DMG_PATH"
 
+SETTINGS_PATH="$BUILD_DIR/dmg_settings.py"
+cat > "$SETTINGS_PATH" <<PYEOF
+app = "$APP_PATH"
+appname = "Flang.app"
+
+format = "UDZO"
+files = [app]
+symlinks = {"Applications": "/Applications"}
+
+icon_locations = {
+    appname: (140, 170),
+    "Applications": (400, 170),
+}
+
+window_rect = ((200, 200), (540, 380))
+icon_size = 128
+text_size = 14
+background = "builtin-arrow"
+PYEOF
+
 echo "Packaging $DMG_PATH..."
-create-dmg \
-  --volname "Flang $VERSION" \
-  --window-size 540 380 \
-  --icon-size 128 \
-  --icon "Flang.app" 140 170 \
-  --app-drop-link 400 170 \
-  --hide-extension "Flang.app" \
-  "$DMG_PATH" \
-  "$APP_PATH"
+python3 -m dmgbuild -s "$SETTINGS_PATH" "Flang $VERSION" "$DMG_PATH"
 
 echo "Done: $DMG_PATH"
