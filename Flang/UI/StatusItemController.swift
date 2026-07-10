@@ -12,12 +12,14 @@ import AppKit
 final class StatusItemController: NSObject {
     private let statusItem: NSStatusItem
     private let manager: InputSourceManager
-    private let flagStore = FlagStore()
-    private let settings = SettingsStore()
+    let flagStore: FlagStore
+    private let settings: SettingsStore
 
-    /// Palette input sources activated for the parity menu items.
+    /// Called when the user picks "Settings…" from the right-click menu.
+    var onOpenSettings: (() -> Void)?
+
+    /// Palette input source activated for the Keyboard Viewer parity item.
     private let keyboardViewerID = "com.apple.KeyboardViewer"
-    private let characterPaletteID = "com.apple.CharacterPaletteIM"
 
     /// Longest full-name text shown in the indicator before it is ellipsized
     /// (SPEC section 5: cap the indicator width).
@@ -29,23 +31,30 @@ final class StatusItemController: NSObject {
         max(FlagRenderer.menuHeight, NSStatusBar.system.thickness - 4)
     }
 
-    init(manager: InputSourceManager) {
+    init(manager: InputSourceManager, settings: SettingsStore) {
         self.manager = manager
+        self.settings = settings
+        self.flagStore = FlagStore(settings: settings)
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
 
         if let button = statusItem.button {
-            // Never enlarge the flag to fill the button (which cropped tall/light
-            // flags); only shrink to fit, preserving aspect ratio.
             button.imageScaling = .scaleProportionallyDown
-            // Handle the click ourselves so left-click opens the main menu and
-            // right-click opens the app menu (Quit), instead of a fixed menu.
             button.target = self
             button.action = #selector(statusItemClicked)
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
         manager.delegate = self
+        updateIndicator(for: manager.currentInputSource)
+
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(settingsDidChange),
+            name: SettingsStore.didChange, object: settings
+        )
+    }
+
+    @objc private func settingsDidChange() {
         updateIndicator(for: manager.currentInputSource)
     }
 
@@ -58,8 +67,6 @@ final class StatusItemController: NSObject {
         showMenu(wantsAppMenu ? buildAppMenu() : buildMainMenu())
     }
 
-    /// Present a menu under the status item, then detach it so the next click routes
-    /// back through the button action (left/right detection).
     private func showMenu(_ menu: NSMenu) {
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
@@ -70,17 +77,12 @@ final class StatusItemController: NSObject {
 
     @objc
     private func inputSourceItemClicked(_ sender: NSMenuItem) {
-        // The Source ID travels with the menu item, so switching never depends on the title.
         guard let id = sender.representedObject as? String else { return }
         manager.selectInputSource(id: id)
     }
 
     @objc private func openSettings() {
-        // Settings window is wired in Phase 4b-2.
-    }
-
-    @objc private func showEmojiSymbols() {
-        NSApp.orderFrontCharacterPalette(self)
+        onOpenSettings?()
     }
 
     @objc private func showKeyboardViewer() {
@@ -100,17 +102,12 @@ final class StatusItemController: NSObject {
 
     // MARK: - Indicator (FR-4)
 
-    /// Refresh the menu bar indicator for the active source, composed from the flag
-    /// and name settings (FR-4). Leaves it untouched when the source can't be read.
     private func updateIndicator(for source: InputSource?) {
         guard let button = statusItem.button, let source else { return }
         let flag = flagImage(for: source)
         let name = nameText(for: source)
 
         if flag == nil && name == nil {
-            // "None" + "None": show the source's system icon ("like Apple"); the
-            // indicator is never empty. If there is no icon, fall back to the
-            // abbreviation, which is what macOS itself shows.
             let icon = flagStore.systemIcon(for: source, height: indicatorHeight)
             setIndicator(button, image: icon, title: icon == nil ? source.shortName : nil, source: source)
         } else {
@@ -127,9 +124,10 @@ final class StatusItemController: NSObject {
     }
 
     private func nameText(for source: InputSource) -> String? {
+        let custom = settings.customization(for: source.id)
         switch settings.nameSetting {
-        case .short: return source.shortName
-        case .full: return truncated(source.name)
+        case .short: return custom.shortName ?? source.shortName
+        case .full: return truncated(custom.fullName ?? source.name)
         case .none: return nil
         }
     }
@@ -138,7 +136,6 @@ final class StatusItemController: NSObject {
         image?.accessibilityDescription = source.name
         button.image = image
         button.title = title ?? ""
-        // The full name is always reachable on hover (SPEC section 5).
         button.toolTip = source.name
         if image != nil && title != nil {
             button.imagePosition = .imageLeading
@@ -149,7 +146,6 @@ final class StatusItemController: NSObject {
         }
     }
 
-    /// Truncate long text with a middle ellipsis (SPEC section 5: "посередине").
     private func truncated(_ text: String) -> String {
         guard text.count > maxIndicatorTitleLength else { return text }
         let kept = maxIndicatorTitleLength - 1
@@ -160,16 +156,16 @@ final class StatusItemController: NSObject {
 
     // MARK: - Menus (FR-2, FR-5)
 
-    /// The main (left-click) menu: exact copy of the system input menu (FR-2).
-    /// Sources, then system parity items. No app-specific items.
     private func buildMainMenu() -> NSMenu {
         let menu = NSMenu()
         let sources = manager.inputSources
         let menuMode = settings.menuFlagMode
 
         for source in sources {
+            let custom = settings.customization(for: source.id)
+            let displayName = custom.fullName ?? source.name
             let item = NSMenuItem(
-                title: source.name,
+                title: displayName,
                 action: #selector(inputSourceItemClicked(_:)),
                 keyEquivalent: ""
             )
@@ -177,18 +173,11 @@ final class StatusItemController: NSObject {
             item.image = flagStore.image(for: source, mode: menuMode, height: FlagRenderer.menuHeight)
             item.representedObject = source.id
             item.state = source.isSelected ? .on : .off
-            item.toolTip = source.name
+            item.toolTip = displayName
             menu.addItem(item)
         }
 
         menu.addItem(.separator())
-        if manager.isSourceEnabled(id: characterPaletteID) {
-            menu.addItem(makeActionItem(
-                "Show Emoji & Symbols",
-                #selector(showEmojiSymbols),
-                icon: parityIcon(sourceID: characterPaletteID)
-            ))
-        }
         if manager.isSourceAvailable(id: keyboardViewerID) {
             menu.addItem(makeActionItem(
                 "Show Keyboard Viewer",
@@ -202,7 +191,6 @@ final class StatusItemController: NSObject {
         return menu
     }
 
-    /// The app (right-click / ⌃-click) menu: Settings and Quit (FR-5).
     private func buildAppMenu() -> NSMenu {
         let menu = NSMenu()
         let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
@@ -222,8 +210,6 @@ final class StatusItemController: NSObject {
         return item
     }
 
-    /// The source's own macOS icon as a small template glyph, keeping its aspect
-    /// ratio (the palette icon is 16x14, so it must not be squished into a square).
     private func parityIcon(sourceID: String) -> NSImage? {
         guard let icon = manager.icon(forSourceID: sourceID) else { return nil }
         let maxHeight = FlagRenderer.menuHeight
@@ -246,8 +232,6 @@ extension StatusItemController: InputSourceMonitoring {
     }
 
     func enabledInputSourcesDidChange() {
-        // The menu is built on demand at click time, so only the indicator needs
-        // refreshing here.
         updateIndicator(for: manager.currentInputSource)
     }
 }
