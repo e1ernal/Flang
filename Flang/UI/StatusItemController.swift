@@ -87,6 +87,9 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func showEmojiSymbols() {
+        // As an accessory-policy app (no Dock icon), the palette can silently
+        // fail to become visible unless the app is explicitly activated first.
+        NSApp.activate(ignoringOtherApps: true)
         NSApp.orderFrontCharacterPalette(self)
     }
 
