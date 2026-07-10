@@ -23,6 +23,22 @@
         }
       }
     },
+    "Add Input Source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Input Source"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить источник ввода"
+          }
+        }
+      }
+    },
     "Acknowledgements" : {
       "localizations" : {
         "en" : {
@@ -83,6 +99,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Collapsed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapsed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Свёрнуто"
           }
         }
       }
@@ -243,6 +275,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Эмодзи"
+          }
+        }
+      }
+    },
+    "Expanded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expanded"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Развёрнуто"
           }
         }
       }

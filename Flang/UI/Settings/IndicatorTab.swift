@@ -77,6 +77,7 @@ struct IndicatorTab: View {
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(theme.chipChevron)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
@@ -104,6 +105,7 @@ struct IndicatorTab: View {
 
     private var previewIndicator: some View {
         let source = manager.currentInputSource
+        let name = source.flatMap(nameText)
         return HStack(spacing: 6) {
             if let source, let image = flagImage(for: source) {
                 Image(nsImage: image)
@@ -115,18 +117,23 @@ struct IndicatorTab: View {
                         RoundedRectangle(cornerRadius: FlangRadius.flagImage)
                             .strokeBorder(theme.heroFlagStroke, lineWidth: 0.5)
                     )
+                    // Decorative next to the name text; when there's no name shown,
+                    // the flag alone must still say something to VoiceOver.
+                    .accessibilityLabel(name == nil ? Text(source.name) : Text(""))
+                    .accessibilityHidden(name != nil)
             }
-            if let source, let name = nameText(for: source) {
+            if let name {
                 Text(name)
                     .font(FlangFont.label.weight(.medium))
                     .foregroundStyle(theme.primaryText)
             }
-            if flagImage(for: source) == nil && nameText(for: source) == nil {
+            if flagImage(for: source) == nil && name == nil {
                 if let source, let icon = flagStore.systemIcon(for: source, height: 16) {
                     Image(nsImage: icon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 16)
+                        .accessibilityLabel(Text(source.name))
                 } else if let source {
                     Text(source.shortName)
                         .font(FlangFont.label.weight(.medium))
@@ -166,6 +173,7 @@ struct IndicatorTab: View {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .font(FlangFont.chevron)
+                        .accessibilityHidden(true)
                     Text("Indicator")
                         .font(FlangFont.label)
                 }
@@ -215,6 +223,7 @@ struct IndicatorTab: View {
                     Image(systemName: "checkmark")
                         .font(FlangFont.chevron)
                         .foregroundStyle(theme.accent)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.vertical, 8)
@@ -223,5 +232,6 @@ struct IndicatorTab: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

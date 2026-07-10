@@ -57,6 +57,7 @@ struct InputSourcesTab: View {
                         .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Add Input Source")
             }
             .padding(.bottom, 16)
 
@@ -130,6 +131,7 @@ struct InputSourcesTab: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(theme.secondaryText)
                 .font(FlangFont.caption)
+                .accessibilityHidden(true)
             TextField("Search", text: $searchText)
                 .textFieldStyle(.plain)
                 .font(FlangFont.label)
@@ -174,6 +176,7 @@ struct InputSourcesTab: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 24, height: 16)
                     .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
+                    .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(custom.fullName ?? source.name)
@@ -187,10 +190,12 @@ struct InputSourcesTab: View {
                 Image(systemName: expanded ? "chevron.down" : "chevron.right")
                     .font(FlangFont.chevron)
                     .foregroundStyle(theme.secondaryText)
+                    .accessibilityHidden(true)
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityValue(Text(expanded ? "Expanded" : "Collapsed"))
     }
 
     // MARK: - Helpers
@@ -259,10 +264,12 @@ extension InputSourcesTab {
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 12)
                             .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
+                            .accessibilityHidden(true)
                     }
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 8, weight: .semibold))
                         .foregroundStyle(theme.chipChevron)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -310,6 +317,7 @@ extension InputSourcesTab {
             .foregroundStyle(theme.primaryText)
             .frame(maxWidth: 160)
             .multilineTextAlignment(.trailing)
+            .accessibilityLabel(label)
         }
         .padding(.vertical, FlangSpacing.nestedPadding)
     }

@@ -61,6 +61,7 @@ struct FirstLaunchView: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 FlangAppIcon(size: FlangSpacing.heroIconSize)
+                    .accessibilityHidden(true)
                     .padding(.bottom, 16)
 
                 Text("Welcome to Flang")
@@ -136,6 +137,9 @@ struct FirstLaunchView: View {
                             .strokeBorder(theme.heroMenuStroke, lineWidth: 0.5)
                     )
             )
+            // A static mockup of the menu bar, not real content — the caption
+            // below already says the same thing in words, so VoiceOver skips it.
+            .accessibilityHidden(true)
 
             Text("Your flag + short name, right where the old indicator was")
                 .font(FlangFont.captionSmall)
@@ -154,6 +158,7 @@ struct FirstLaunchView: View {
                     RoundedRectangle(cornerRadius: FlangRadius.heroIcon)
                         .fill(theme.heroIconBackground)
                 )
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Right-click the flag")
