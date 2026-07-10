@@ -16,11 +16,13 @@ final class SettingsWindowController {
     private let settings: SettingsStore
     private let flagStore: FlagStore
     private let manager: InputSourceManager
+    private let updateChecker: UpdateChecker
 
-    init(settings: SettingsStore, flagStore: FlagStore, manager: InputSourceManager) {
+    init(settings: SettingsStore, flagStore: FlagStore, manager: InputSourceManager, updateChecker: UpdateChecker) {
         self.settings = settings
         self.flagStore = flagStore
         self.manager = manager
+        self.updateChecker = updateChecker
     }
 
     func showWindow() {
@@ -33,7 +35,8 @@ final class SettingsWindowController {
         let settingsView = SettingsView(
             settings: settings,
             flagStore: flagStore,
-            manager: manager
+            manager: manager,
+            updateChecker: updateChecker
         )
         let hostingView = NSHostingView(rootView: settingsView)
 

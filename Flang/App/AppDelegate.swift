@@ -11,6 +11,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let inputSourceManager = InputSourceManager()
     private let settings = SettingsStore()
+    private let updateChecker = UpdateChecker()
     private var statusItemController: StatusItemController?
     private var settingsWindowController: SettingsWindowController?
     private var firstLaunchWindowController: FirstLaunchWindowController?
@@ -25,7 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settingsWindowController = SettingsWindowController(
             settings: settings,
             flagStore: controller.flagStore,
-            manager: inputSourceManager
+            manager: inputSourceManager,
+            updateChecker: updateChecker
         )
         controller.onOpenSettings = { [weak self] in
             self?.settingsWindowController?.showWindow()
@@ -39,6 +41,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             firstLaunchWindowController?.showWindow { [weak self] in
                 self?.settings.markAsLaunched()
             }
+        }
+
+        Task { [settings, updateChecker] in
+            await updateChecker.checkIfDue(settings: settings)
         }
     }
 }

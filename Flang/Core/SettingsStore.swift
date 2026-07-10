@@ -57,6 +57,8 @@ final class SettingsStore: ObservableObject {
     private let nameKey = "NameSetting"
     private let customizationsKey = "SourceCustomizations"
     private let hasLaunchedKey = "HasLaunchedBefore"
+    private let autoCheckForUpdatesKey = "AutoCheckForUpdates"
+    private let lastUpdateCheckKey = "LastUpdateCheck"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -93,6 +95,24 @@ final class SettingsStore: ObservableObject {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {}
+        }
+    }
+
+    // MARK: - Updates (FR-13)
+
+    @Published var autoCheckForUpdates: Bool = true {
+        didSet {
+            defaults.set(autoCheckForUpdates, forKey: autoCheckForUpdatesKey)
+        }
+    }
+
+    @Published var lastUpdateCheck: Date? {
+        didSet {
+            if let lastUpdateCheck {
+                defaults.set(lastUpdateCheck, forKey: lastUpdateCheckKey)
+            } else {
+                defaults.removeObject(forKey: lastUpdateCheckKey)
+            }
         }
     }
 
@@ -150,5 +170,7 @@ final class SettingsStore: ObservableObject {
     func load() {
         flagSetting = defaults.string(forKey: flagKey).flatMap(FlagSetting.init) ?? .image
         nameSetting = defaults.string(forKey: nameKey).flatMap(NameSetting.init) ?? .none
+        autoCheckForUpdates = defaults.object(forKey: autoCheckForUpdatesKey) as? Bool ?? true
+        lastUpdateCheck = defaults.object(forKey: lastUpdateCheckKey) as? Date
     }
 }

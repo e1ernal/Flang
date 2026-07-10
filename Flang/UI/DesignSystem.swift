@@ -68,6 +68,11 @@ enum FlangRadius {
     /// number under 8, stays as-is (see the rounding rule above).
     static let chip: CGFloat = 6
 
+    /// Outer grouping panel — the About tab's "app info" and "footer links"
+    /// sections. Bigger than `card` since it wraps a whole group rather than
+    /// sitting flush inside one.
+    static let panel: CGFloat = 16
+
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
     static let heroIcon: CGFloat = field
@@ -94,6 +99,10 @@ enum FlangFont {
     static let heroTitle = Font.system(size: 20, weight: .semibold)
     static let heroButton = Font.system(size: 14, weight: .medium)
     static let tinyLabel = Font.system(size: 9)
+
+    /// App name in the About tab's info card — bigger than `screenTitle`,
+    /// used once as the hero moment of that tab.
+    static let appName = Font.system(size: 26, weight: .bold)
 }
 
 enum FlangMotion {
@@ -197,6 +206,20 @@ struct FlangColor {
     /// own subtle highlight tint.
     var sectionBackground: Color {
         isDark ? Color.black.opacity(0.2) : Color.black.opacity(0.035)
+    }
+
+    /// Background of the About tab's two outer panels (app info, footer
+    /// links) — a very faint overlay, one step lighter than the window
+    /// itself but distinct from `cardBackground`'s solid fill.
+    var outerPanelBackground: Color {
+        isDark ? Color.white.opacity(0.03) : Color.black.opacity(0.02)
+    }
+
+    /// Footer link text (Quit Flang, Acknowledgements, Report a Bug,
+    /// GitHub) — dimmer than `primaryText` but brighter than `secondaryText`,
+    /// matching the mockup's own distinct value for these rows.
+    var linkText: Color {
+        isDark ? Color.white.opacity(0.7) : Color.black.opacity(0.65)
     }
 
     var accent: Color {

@@ -12,6 +12,7 @@ struct SettingsView: View {
     @ObservedObject var settings: SettingsStore
     let flagStore: FlagStore
     @ObservedObject var manager: InputSourceManager
+    @ObservedObject var updateChecker: UpdateChecker
 
     @State private var selection: Tab = .general
 
@@ -108,7 +109,7 @@ struct SettingsView: View {
         case .inputSources:
             InputSourcesTab(settings: settings, flagStore: flagStore, manager: manager)
         case .about:
-            AboutTab()
+            AboutTab(settings: settings, updateChecker: updateChecker)
         }
     }
 }
