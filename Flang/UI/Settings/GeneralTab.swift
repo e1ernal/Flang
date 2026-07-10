@@ -80,6 +80,7 @@ struct GeneralTab: View {
             .labelsHidden()
             .toggleStyle(.switch)
             .tint(theme.toggleOn)
+            .accessibilityLabel("Launch at Login")
         }
         .padding(FlangSpacing.cardPadding)
     }
@@ -103,6 +104,7 @@ struct GeneralTab: View {
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(theme.secondaryText)
+                    .accessibilityHidden(true)
             }
             .padding(FlangSpacing.cardPadding)
             .contentShape(Rectangle())
@@ -115,6 +117,7 @@ struct GeneralTab: View {
             Image(systemName: "lightbulb")
                 .font(.system(size: 15))
                 .foregroundStyle(theme.secondaryText)
+                .accessibilityHidden(true)
             Text("Right-click the flag in your menu bar to jump straight into these settings.")
                 .font(FlangFont.caption)
                 .foregroundStyle(theme.secondaryText)
@@ -133,6 +136,7 @@ struct GeneralTab: View {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .font(FlangFont.chevron)
+                        .accessibilityHidden(true)
                     Text("General")
                         .font(FlangFont.label)
                 }
@@ -158,6 +162,7 @@ struct GeneralTab: View {
                                 Image(systemName: "checkmark")
                                     .font(FlangFont.chevron)
                                     .foregroundStyle(theme.accent)
+                                    .accessibilityHidden(true)
                             }
                         }
                         .padding(.vertical, 8)
@@ -166,6 +171,7 @@ struct GeneralTab: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                 }
             }
             .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))

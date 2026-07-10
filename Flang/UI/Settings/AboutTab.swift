@@ -47,6 +47,7 @@ struct AboutTab: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: FlangSpacing.cardPadding) {
                 FlangAppIcon(size: FlangSpacing.heroIconSize)
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Flang")
                         .font(FlangFont.appName)
@@ -78,6 +79,7 @@ struct AboutTab: View {
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .tint(theme.toggleOn)
+                .accessibilityLabel("Automatically check for updates")
         }
         .padding(.horizontal, FlangSpacing.cardPadding)
         .padding(.vertical, FlangSpacing.nestedPadding)

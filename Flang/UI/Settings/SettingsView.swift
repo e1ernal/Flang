@@ -95,6 +95,7 @@ struct SettingsView: View {
                 .foregroundStyle(selection == tab ? theme.onAccent : theme.sidebarItemText)
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selection == tab ? .isSelected : [])
     }
 
     // MARK: - Content

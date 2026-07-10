@@ -67,6 +67,7 @@ struct FlagPickerSheet: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(theme.secondaryText)
                 .font(FlangFont.caption)
+                .accessibilityHidden(true)
             TextField("Search countries", text: $searchText)
                 .textFieldStyle(.plain)
                 .font(FlangFont.label)
@@ -89,6 +90,7 @@ struct FlagPickerSheet: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 20)
+                        .accessibilityHidden(true)
                 }
                 Text(region.name)
                     .font(FlangFont.tinyLabel)
@@ -103,5 +105,6 @@ struct FlagPickerSheet: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
