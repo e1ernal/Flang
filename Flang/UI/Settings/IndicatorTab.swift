@@ -128,7 +128,7 @@ struct IndicatorTab: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
+        .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.field))
     }
 
     private func flagImage(for source: InputSource?) -> NSImage? {

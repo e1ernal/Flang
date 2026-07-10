@@ -60,9 +60,10 @@ struct FirstLaunchView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
-                Image(nsImage: NSApp.applicationIconImage)
+                Image("AppLogo")
                     .resizable()
-                    .frame(width: 64, height: 64)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: FlangSpacing.heroIconSize, height: FlangSpacing.heroIconSize)
                     .padding(.bottom, 16)
 
                 Text("Welcome to Flang")

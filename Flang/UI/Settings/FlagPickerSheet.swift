@@ -98,7 +98,7 @@ struct FlagPickerSheet: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
             .background(
-                RoundedRectangle(cornerRadius: FlangRadius.chip)
+                RoundedRectangle(cornerRadius: FlangRadius.field)
                     .fill(isSelected ? theme.accent.opacity(0.12) : Color.clear)
             )
         }

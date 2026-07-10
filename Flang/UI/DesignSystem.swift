@@ -10,28 +10,37 @@ import SwiftUI
 /// Named spacing constants, so paddings match `_local/design/INDEX.md`
 /// instead of being re-typed per file.
 enum FlangSpacing {
-    static let screenTop: CGFloat = 44
+    /// Every value here is a multiple of 8, rounded from the original mockup
+    /// measurements (`_local/design/INDEX.md`) to a consistent 8pt grid.
+    static let screenTop: CGFloat = 48
     static let screenSides: CGFloat = 32
 
-    static let cardPaddingH: CGFloat = 16
-    static let cardPaddingV: CGFloat = 12
+    static let cardPadding: CGFloat = 16
 
     static let heroPadding: CGFloat = 24
     static let heroButtonInset: CGFloat = 24
+    /// Large logo mark shared by the First Launch card and the About tab —
+    /// one size for both keeps them visually consistent.
+    static let heroIconSize: CGFloat = 80
 
-    static let settingsWindowSize = CGSize(width: 640, height: 420)
-    static let sidebarWidth: CGFloat = 172
+    static let settingsWindowSize = CGSize(width: 640, height: 424)
+    static let sidebarWidth: CGFloat = 176
 }
 
-/// Two independent radius scales: `card`/`sidebarItem`/`chip`/`field` for the
+/// Two independent radius scales: `card`/`sidebarItem`/`field` for the
 /// Settings window, `hero*` for the First Launch card — the mockups use a
-/// visibly larger scale there, not a mistake to reconcile.
+/// visibly larger scale there, not a mistake to reconcile. All values are
+/// multiples of 8; `sidebarItem`/`card`/`field` converge on the same 8pt
+/// step, which is expected on a grid this coarse, not a bug to "fix" by
+/// merging them into one constant — each still names a distinct role.
 enum FlangRadius {
-    static let sidebarItem: CGFloat = 7
-    static let card: CGFloat = 10
-    static let chip: CGFloat = 6
+    static let sidebarItem: CGFloat = 8
+    static let card: CGFloat = 8
     static let field: CGFloat = 8
-    static let flagImage: CGFloat = 2
+    /// The flag swatch in the First Launch menu bar preview is 12pt tall —
+    /// an 8pt radius would clip it into a pill, so this rounds down to 0
+    /// (square corners) rather than up to 8.
+    static let flagImage: CGFloat = 0
 
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
@@ -155,15 +164,14 @@ struct FlangColor {
     }
 }
 
-/// The repeated "grouped card" background (padding 16/12, corner radius 10)
-/// that `GeneralTab`, `IndicatorTab`, and `InputSourcesTab` each reimplemented.
+/// The repeated "grouped card" background that `GeneralTab`, `IndicatorTab`,
+/// and `InputSourcesTab` each reimplemented.
 struct FlangCard: ViewModifier {
     let theme: FlangColor
 
     func body(content: Content) -> some View {
         content
-            .padding(.horizontal, FlangSpacing.cardPaddingH)
-            .padding(.vertical, FlangSpacing.cardPaddingV)
+            .padding(FlangSpacing.cardPadding)
             .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: FlangRadius.card))
     }
 }
