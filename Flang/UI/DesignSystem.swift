@@ -29,18 +29,21 @@ enum FlangSpacing {
 
 /// Two independent radius scales: `card`/`sidebarItem`/`field` for the
 /// Settings window, `hero*` for the First Launch card — the mockups use a
-/// visibly larger scale there, not a mistake to reconcile. All values are
-/// multiples of 8; `sidebarItem`/`card`/`field` converge on the same 8pt
-/// step, which is expected on a grid this coarse, not a bug to "fix" by
-/// merging them into one constant — each still names a distinct role.
+/// visibly larger scale there, not a mistake to reconcile. Values of 8 or
+/// more sit on the 8pt grid; `sidebarItem`/`card`/`field` converge on the
+/// same step, which is expected on a grid this coarse, not a bug to "fix" by
+/// merging them into one constant — each still names a distinct role. Values
+/// under 8 round to the nearest larger *even* number instead — collapsing
+/// them onto the 8pt grid would zero out small radii that still need to read
+/// as "slightly rounded" rather than "square."
 enum FlangRadius {
     static let sidebarItem: CGFloat = 8
     static let card: CGFloat = 8
     static let field: CGFloat = 8
     /// The flag swatch in the First Launch menu bar preview is 12pt tall —
-    /// an 8pt radius would clip it into a pill, so this rounds down to 0
-    /// (square corners) rather than up to 8.
-    static let flagImage: CGFloat = 0
+    /// already an even number under 8, so it stays as-is rather than
+    /// collapsing to 0 or jumping up to the 8pt grid.
+    static let flagImage: CGFloat = 2
 
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
