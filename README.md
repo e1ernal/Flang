@@ -11,9 +11,6 @@ flag. Apple then replaced the flags with plain text labels ("ABC", "ES").
 Flang is a small menu bar app that brings the flags back — and lets you decide
 which flag, and which name, represents each of your languages.
 
-> **Work in progress.** Flang is under active development and has not reached
-> its first stable release yet. See the [roadmap](#roadmap).
-
 <!-- TODO: screenshot / GIF of the menu bar switcher here -->
 
 ## Features
@@ -34,7 +31,11 @@ Spanish? Two clicks.
 
 ## Installation
 
-Flang is not released yet. To try the development version:
+Download the latest DMG from
+[GitHub Releases](https://github.com/e1ernal/Flang/releases), open it, and
+drag Flang.app into Applications — then see below before opening it.
+
+To build from source instead:
 
 ```bash
 git clone https://github.com/e1ernal/Flang.git
@@ -42,10 +43,6 @@ open Flang/Flang.xcodeproj
 ```
 
 Build and run with Cmd+R (Xcode 16 or newer, macOS 13 Ventura or newer).
-
-Once released, Flang will ship as a DMG on
-[GitHub Releases](https://github.com/e1ernal/Flang/releases) — download it and
-drag Flang.app into Applications, then see below before opening it.
 
 ### Opening an unsigned app
 
@@ -106,7 +103,7 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Start at login, first-launch tips
 - [x] Update check against GitHub Releases
 - [x] Interface localized in EN and RU
-- [ ] DMG releases with built-in update notifications
+- [x] DMG releases with built-in update notifications
 - [ ] Localized README (ES, FR, JA, PT-BR, ZH-Hans)
 - [ ] Signed builds and automatic updates
 
