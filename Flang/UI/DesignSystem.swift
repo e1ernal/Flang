@@ -25,6 +25,21 @@ enum FlangSpacing {
 
     static let settingsWindowSize = CGSize(width: 640, height: 424)
     static let sidebarWidth: CGFloat = 176
+
+    /// The sidebar floats as an inset rounded panel (mockup: `margin: 14px 0 14px
+    /// 14px`), not flush against the window edges — this is that inset, rounded
+    /// from 14.
+    static let sidebarMargin: CGFloat = 16
+    static let sidebarPaddingTop: CGFloat = 24
+    /// Side padding for the sidebar's own content, and reused as each item row's
+    /// own horizontal/vertical padding (mockup: 10px sides on the container, 7px
+    /// vertical / 10px horizontal per row — both round to 8, so one constant
+    /// covers both nesting levels).
+    static let sidebarPadding: CGFloat = 8
+    static let sidebarPaddingBottom: CGFloat = 16
+    static let sidebarHeaderGap: CGFloat = 16
+    /// Small logo mark next to "Flang" in the sidebar header (mockup: 22pt).
+    static let sidebarAppIconSize: CGFloat = 24
 }
 
 /// Two independent radius scales: `card`/`sidebarItem`/`field` for the
@@ -48,6 +63,11 @@ enum FlangRadius {
     static let heroCard: CGFloat = 40
     static let heroButton: CGFloat = 16
     static let heroIcon: CGFloat = field
+
+    /// The sidebar's own floating-panel corner radius (mockup: 16px) — a
+    /// distinct role from `card`, even though `heroButton` happens to share
+    /// the same value.
+    static let sidebarPanel: CGFloat = 16
 
     /// macOS's own app-icon corner radius is ~22.37% of the canvas size (the
     /// "squircle" ratio behind every Big Sur+ icon template). Applied to
@@ -112,6 +132,37 @@ struct FlangColor {
 
     var separator: Color {
         isDark ? Color.white.opacity(0.06) : Color.black.opacity(0.06)
+    }
+
+    /// "Flang" wordmark in the sidebar header — very slightly brighter than
+    /// `primaryText`, matching the mockup's own distinct value for it.
+    var sidebarTitleText: Color {
+        isDark ? Color.white.opacity(0.92) : Color.black.opacity(0.85)
+    }
+
+    /// Icon + label of an unselected sidebar item — dimmer than `primaryText`,
+    /// which is reserved for card row labels.
+    var sidebarItemText: Color {
+        isDark ? Color.white.opacity(0.6) : Color.black.opacity(0.5)
+    }
+
+    /// Background of the tip/hint row under a card (e.g. GeneralTab's
+    /// right-click hint) — distinct from `separator`, which is for hairlines.
+    var tipBackground: Color {
+        isDark ? Color.white.opacity(0.04) : Color.black.opacity(0.03)
+    }
+
+    /// Highlight fill for the selected row in a picker list (e.g. Interface
+    /// Language). The opacity differs per theme in the mockup, not just a
+    /// flat `accent.opacity()` reused verbatim.
+    var pickerSelectedBackground: Color {
+        accent.opacity(isDark ? 0.18 : 0.12)
+    }
+
+    /// Selected picker row's own label text — white in dark mode, accent blue
+    /// in light mode (the mockup does not use the same color for both).
+    var pickerSelectedText: Color {
+        isDark ? .white : accent
     }
 
     var accent: Color {
