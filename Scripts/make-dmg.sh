@@ -14,6 +14,10 @@
 # permission prompt — a dead end in any non-interactive/headless context.
 # dmgbuild writes the .DS_Store layout directly, no Finder automation needed.
 #
+# The window background (Scripts/dmg-assets/) matches the app's own design
+# system instead of dmgbuild's generic built-in arrow — regenerate it with
+# Scripts/make-dmg-background.py if you change the layout below.
+#
 # Requires: dmgbuild (pip3 install --user dmgbuild).
 #
 # Usage:
@@ -52,6 +56,9 @@ VERSION="$(defaults read "$APP_PATH/Contents/Info" CFBundleShortVersionString)"
 DMG_PATH="$BUILD_DIR/Flang-$VERSION.dmg"
 rm -f "$DMG_PATH"
 
+VOLUME_ICON="$APP_PATH/Contents/Resources/AppIcon.icns"
+BACKGROUND="$REPO_ROOT/Scripts/dmg-assets/background.png"
+
 SETTINGS_PATH="$BUILD_DIR/dmg_settings.py"
 cat > "$SETTINGS_PATH" <<PYEOF
 app = "$APP_PATH"
@@ -60,6 +67,7 @@ appname = "Flang.app"
 format = "UDZO"
 files = [app]
 symlinks = {"Applications": "/Applications"}
+icon = "$VOLUME_ICON"
 
 icon_locations = {
     appname: (140, 170),
@@ -69,7 +77,7 @@ icon_locations = {
 window_rect = ((200, 200), (540, 380))
 icon_size = 128
 text_size = 14
-background = "builtin-arrow"
+background = "$BACKGROUND"
 PYEOF
 
 echo "Packaging $DMG_PATH..."
