@@ -11,7 +11,7 @@ import SwiftUI
 struct IndicatorTab: View {
     @ObservedObject var settings: SettingsStore
     let flagStore: FlagStore
-    let manager: InputSourceManager
+    @ObservedObject var manager: InputSourceManager
 
     enum PickerKind { case flag, name }
     @State private var activePicker: PickerKind?

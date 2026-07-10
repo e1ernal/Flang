@@ -58,7 +58,10 @@ protocol InputSourceMonitoring: AnyObject {
 }
 
 /// The only place in the app that talks to the Carbon Text Input Sources (TIS) API.
-final class InputSourceManager {
+/// `ObservableObject` so SwiftUI views (the Settings window) can refresh their
+/// source list live, alongside the `InputSourceMonitoring` delegate used by the
+/// AppKit menu.
+final class InputSourceManager: ObservableObject {
     weak var delegate: InputSourceMonitoring?
 
     private let notificationCenter: CFNotificationCenter
@@ -201,6 +204,7 @@ final class InputSourceManager {
                 } else if rawName == (kTISNotifyEnabledKeyboardInputSourcesChanged as String) {
                     manager.delegate?.enabledInputSourcesDidChange()
                 }
+                manager.objectWillChange.send()
             }
         }
 

@@ -11,7 +11,7 @@ import SwiftUI
 struct InputSourcesTab: View {
     @ObservedObject var settings: SettingsStore
     let flagStore: FlagStore
-    let manager: InputSourceManager
+    @ObservedObject var manager: InputSourceManager
 
     @State private var expandedSources: Set<String> = []
     @State private var searchText = ""
