@@ -1,358 +1,963 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "ABC" : {
+
+    },
     "About" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "О программе" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О программе"
+          }
+        }
       }
     },
     "Acknowledgements" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Acknowledgements" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Благодарности" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Благодарности"
+          }
+        }
       }
     },
     "Automatically check for updates" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Automatically check for updates" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Автоматически проверять обновления" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically check for updates"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически проверять обновления"
+          }
+        }
       }
     },
     "Automatically start Flang when you log in." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Automatically start Flang when you log in." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Автоматически запускать Flang при входе в систему." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically start Flang when you log in."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически запускать Flang при входе в систему."
+          }
+        }
       }
     },
     "Cancel" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Отмена" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
       }
     },
     "Check for Updates" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check for Updates" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Проверить обновления" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверить обновления"
+          }
+        }
       }
     },
     "Choose Flag Emoji" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose Flag Emoji" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Выбор флага-эмодзи" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Flag Emoji"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбор флага-эмодзи"
+          }
+        }
       }
     },
     "Choose Flag Image" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose Flag Image" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Выбор флага-изображения" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Flag Image"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбор флага-изображения"
+          }
+        }
       }
     },
     "Choose how the active input source appears in your menu bar — as a flag, a name, or both." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose how the active input source appears in your menu bar — as a flag, a name, or both." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Выберите, как активный источник ввода отображается в строке меню — флагом, именем или тем и другим." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how the active input source appears in your menu bar — as a flag, a name, or both."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите, как активный источник ввода отображается в строке меню — флагом, именем или тем и другим."
+          }
+        }
       }
     },
     "Couldn't check for updates." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't check for updates." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Не удалось проверить обновления." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't check for updates."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось проверить обновления."
+          }
+        }
       }
     },
     "Couldn't reach GitHub." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't reach GitHub." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Не удалось подключиться к GitHub." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't reach GitHub."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось подключиться к GitHub."
+          }
+        }
       }
     },
     "Country flags are back in your menu bar." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Country flags are back in your menu bar." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Флаги стран снова в строке меню." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Country flags are back in your menu bar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Флаги стран снова в строке меню."
+          }
+        }
       }
     },
     "Customize the flag, emoji and name shown for each input source you've added in System Settings. Tap + to add another." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Customize the flag, emoji and name shown for each input source you've added in System Settings. Tap + to add another." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Настройте флаг, эмодзи и имя для каждого источника ввода, добавленного в Системных настройках. Нажмите «+», чтобы добавить ещё один." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customize the flag, emoji and name shown for each input source you've added in System Settings. Tap + to add another."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройте флаг, эмодзи и имя для каждого источника ввода, добавленного в Системных настройках. Нажмите «+», чтобы добавить ещё один."
+          }
+        }
       }
     },
     "Delete…" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Удалить…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить…"
+          }
+        }
       }
     },
     "Emoji" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Emoji" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Эмодзи" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эмодзи"
+          }
+        }
       }
     },
     "Flag" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Flag" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Флаг" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flag"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Флаг"
+          }
+        }
       }
     },
     "Flag icons by flag-icons (github.com/lipis/flag-icons), MIT License." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Flag icons by flag-icons (github.com/lipis/flag-icons), MIT License." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Иконки флагов — flag-icons (github.com/lipis/flag-icons), лицензия MIT." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flag icons by flag-icons (github.com/lipis/flag-icons), MIT License."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Иконки флагов — flag-icons (github.com/lipis/flag-icons), лицензия MIT."
+          }
+        }
       }
+    },
+    "Flang" : {
+
     },
     "Flang %@ is available" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Flang %@ is available" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Доступна версия Flang %@" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flang %@ is available"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступна версия Flang %@"
+          }
+        }
       }
     },
     "Flang is released under the MIT License." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Flang is released under the MIT License." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Flang распространяется по лицензии MIT." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flang is released under the MIT License."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flang распространяется по лицензии MIT."
+          }
+        }
       }
+    },
+    "Fri Jul 10 9:41" : {
+
     },
     "Full" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Full" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Полное" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полное"
+          }
+        }
       }
     },
     "Full name" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Full name" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Полное имя" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Полное имя"
+          }
+        }
       }
     },
     "General" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "General" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Основные" } }
-      }
-    },
-    "GitHub returned an error." : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "GitHub returned an error." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "GitHub вернул ошибку." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основные"
+          }
+        }
       }
     },
     "Get Started" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Get Started" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Начать" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать"
+          }
+        }
+      }
+    },
+    "GitHub" : {
+
+    },
+    "GitHub returned an error." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub returned an error."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub вернул ошибку."
+          }
+        }
       }
     },
     "Image" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Image" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Изображение" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изображение"
+          }
+        }
       }
     },
     "Indicator" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Indicator" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Индикатор" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indicator"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Индикатор"
+          }
+        }
       }
     },
     "Input Sources" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Input Sources" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Источники ввода" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input Sources"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Источники ввода"
+          }
+        }
       }
     },
     "Interface Language" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Interface Language" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Язык интерфейса" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface Language"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Язык интерфейса"
+          }
+        }
       }
     },
     "Last checked: %@" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last checked: %@" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Последняя проверка: %@" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last checked: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Последняя проверка: %@"
+          }
+        }
       }
     },
     "Later" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Later" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Позже" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Later"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Позже"
+          }
+        }
       }
     },
     "Launch at Login" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Launch at Login" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Запуск при входе" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch at Login"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запуск при входе"
+          }
+        }
       }
     },
     "More languages are coming in a future update." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "More languages are coming in a future update." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Другие языки появятся в одном из следующих обновлений." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More languages are coming in a future update."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другие языки появятся в одном из следующих обновлений."
+          }
+        }
       }
     },
     "Name" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Имя" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя"
+          }
+        }
       }
     },
     "Never checked" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Never checked" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ещё не проверялось" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never checked"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ещё не проверялось"
+          }
+        }
       }
     },
     "None" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "None" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Нет" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
       }
     },
     "Open Keyboard Settings…" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Keyboard Settings…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открыть настройки клавиатуры…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Keyboard Settings…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки клавиатуры…"
+          }
+        }
       }
     },
     "Preview" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Preview" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Предпросмотр" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предпросмотр"
+          }
+        }
       }
     },
     "Quit Flang" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit Flang" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Завершить Flang" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit Flang"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершить Flang"
+          }
+        }
       }
     },
     "Report a Bug" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Report a Bug" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сообщить об ошибке" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report a Bug"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщить об ошибке"
+          }
+        }
       }
     },
     "Reset" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сбросить" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить"
+          }
+        }
       }
     },
     "Reset all customizations for \"%@\" to their default values?" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset all customizations for \"%@\" to their default values?" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сбросить все настройки источника «%@» к значениям по умолчанию?" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset all customizations for \"%@\" to their default values?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить все настройки источника «%@» к значениям по умолчанию?"
+          }
+        }
       }
     },
     "Reset restores this source's flag, emoji and names to their system defaults. Delete removes the input source from the system entirely." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset restores this source's flag, emoji and names to their system defaults. Delete removes the input source from the system entirely." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сброс возвращает флаг, эмодзи и имена источника к системным значениям по умолчанию. Удаление полностью убирает источник ввода из системы." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset restores this source's flag, emoji and names to their system defaults. Delete removes the input source from the system entirely."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сброс возвращает флаг, эмодзи и имена источника к системным значениям по умолчанию. Удаление полностью убирает источник ввода из системы."
+          }
+        }
       }
     },
     "Reset to Defaults" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset to Defaults" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сбросить настройки" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset to Defaults"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сбросить настройки"
+          }
+        }
       }
     },
     "Restart Flang to Apply?" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restart Flang to Apply?" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Перезапустить Flang, чтобы применить?" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Flang to Apply?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезапустить Flang, чтобы применить?"
+          }
+        }
       }
     },
     "Restart Now" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Restart Now" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Перезапустить" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Now"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезапустить"
+          }
+        }
       }
     },
     "Right-click the flag" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Right-click the flag" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Клик правой кнопкой по флагу" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right-click the flag"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Клик правой кнопкой по флагу"
+          }
+        }
       }
     },
     "Right-click the flag in your menu bar to jump straight into these settings." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Right-click the flag in your menu bar to jump straight into these settings." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Кликните правой кнопкой по флагу в строке меню, чтобы сразу попасть в эти настройки." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right-click the flag in your menu bar to jump straight into these settings."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кликните правой кнопкой по флагу в строке меню, чтобы сразу попасть в эти настройки."
+          }
+        }
       }
     },
     "Search" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Поиск" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск"
+          }
+        }
       }
     },
     "Search countries" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search countries" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Поиск стран" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search countries"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск стран"
+          }
+        }
       }
     },
     "Settings…" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Настройки…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки…"
+          }
+        }
       }
     },
     "Short" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Short" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Краткое" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Краткое"
+          }
+        }
       }
     },
     "Short name" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Short name" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Краткое имя" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short name"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Краткое имя"
+          }
+        }
       }
     },
     "Show Keyboard Viewer" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show Keyboard Viewer" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Показать «Просмотр клавиатуры»" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Keyboard Viewer"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать «Просмотр клавиатуры»"
+          }
+        }
       }
     },
     "System Default" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "System Default" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Как в системе" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Default"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Как в системе"
+          }
+        }
       }
     },
     "The new interface language takes effect after Flang restarts." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The new interface language takes effect after Flang restarts." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Новый язык интерфейса вступит в силу после перезапуска Flang." } }
-      }
-    },
-    "Version %@ (%@)\nCopyright © 2026 Flang" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version %@ (%@)\nCopyright © 2026 Flang" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Версия %@ (%@)\nCopyright © 2026 Flang" } }
-      }
-    },
-    "Welcome to Flang" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome to Flang" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Добро пожаловать в Flang" } }
-      }
-    },
-    "Your flag + short name, right where the old indicator was" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your flag + short name, right where the old indicator was" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ваш флаг и краткое имя — там же, где был старый индикатор" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The new interface language takes effect after Flang restarts."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый язык интерфейса вступит в силу после перезапуска Flang."
+          }
+        }
       }
     },
     "to open Settings and customize flags" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "to open Settings and customize flags" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "открывает настройки и позволяет изменить флаги" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "to open Settings and customize flags"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "открывает настройки и позволяет изменить флаги"
+          }
+        }
+      }
+    },
+    "Version %@ (%@)\nCopyright © 2026 Flang" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@ (%@)\nCopyright © 2026 Flang"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия %@ (%@)\nCopyright © 2026 Flang"
+          }
+        }
+      }
+    },
+    "Welcome to Flang" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Flang"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добро пожаловать в Flang"
+          }
+        }
+      }
+    },
+    "Your flag + short name, right where the old indicator was" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your flag + short name, right where the old indicator was"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш флаг и краткое имя — там же, где был старый индикатор"
+          }
+        }
       }
     }
   },

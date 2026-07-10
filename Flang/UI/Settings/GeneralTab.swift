@@ -196,7 +196,17 @@ struct GeneralTab: View {
 
     private func relaunch() {
         let url = Bundle.main.bundleURL
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration()) { _, _ in }
-        NSApp.terminate(nil)
+        let configuration = NSWorkspace.OpenConfiguration()
+        // Without this, openApplication just activates the already-running
+        // instance (us) instead of spawning a new one — terminating right after
+        // then raced LaunchServices trying to activate a process mid-quit,
+        // surfacing "The application is not open anymore".
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: url, configuration: configuration) { app, error in
+            guard app != nil, error == nil else { return }
+            DispatchQueue.main.async {
+                NSApp.terminate(nil)
+            }
+        }
     }
 }
