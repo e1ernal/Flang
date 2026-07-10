@@ -22,11 +22,11 @@ which flag, and which name, represents each of your languages.
 |---|---|
 | Flag in the menu bar | Current input source shown with its flag, updated instantly |
 | Familiar switching | Click to see all your input sources and switch, just like the system menu |
-| Six display styles | System icon, flag, flag + short name, flag + full name, short name, full name |
+| Flexible indicator | Flag and name shown independently — either, both, or neither (falls back to the system icon) |
 | Two flag looks | Flat flag images (the classic look) or native emoji flags |
 | Sensible defaults | Every macOS keyboard layout and input method gets a reasonable default flag |
 | Full personalization | Any flag, custom short name and custom full name for every language |
-| Zero baggage | No network access, no data collection, starts at login, a few megabytes |
+| Minimal footprint | No data collection, starts at login, a few megabytes; the only network call is an optional daily update check |
 
 Languages are not tied to countries — that is exactly why Flang makes the flag
 a personal choice. Prefer the Canadian flag for French, or the Mexican flag for
@@ -46,11 +46,21 @@ Build and run with Cmd+R (Xcode 16 or newer, macOS 13 Ventura or newer).
 ## Usage
 
 1. Launch Flang — a flag appears in your menu bar.
-2. Click it to switch input sources or open Settings.
+2. Click it to switch input sources; right-click for Settings and Quit.
 3. Optional: hide the built-in system switcher in
    System Settings — Keyboard — uncheck "Show Input menu in menu bar".
    macOS does not allow apps to do this automatically, so it is a one-time
-   manual step (illustrated guide coming with the first release).
+   manual step.
+
+   <!-- TODO(docs/images/hide-system-switcher.png): screenshot of System
+   Settings — Keyboard, with "Show Input menu in menu bar" highlighted -->
+
+4. To add or remove a keyboard layout, use Settings — Input Sources — the "+"
+   button (or Delete on a source) opens System Settings — Keyboard — Input
+   Sources, where macOS handles it directly.
+
+   <!-- TODO(docs/images/add-input-source.png): screenshot of System
+   Settings — Keyboard — Input Sources, with the "+" button highlighted -->
 
 ## FAQ
 
@@ -68,11 +78,13 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Switch input sources from the dropdown menu
 - [x] Default flag map for all macOS layouts and input methods
 - [x] Image and emoji flag modes
-- [x] Six display styles
-- [ ] Settings window: custom flag, short and full name per language
-- [ ] Start at login, first-launch tips
-- [ ] Localized interface and README (EN, ES, FR, JA, PT-BR, ZH-Hans, RU)
+- [x] Independent flag and name display settings, with live preview
+- [x] Settings window: custom flag, short and full name per language
+- [x] Start at login, first-launch tips
+- [x] Update check against GitHub Releases
+- [x] Interface localized in EN and RU
 - [ ] DMG releases with built-in update notifications
+- [ ] Localized README (ES, FR, JA, PT-BR, ZH-Hans)
 - [ ] Signed builds and automatic updates
 
 ## Contributing
