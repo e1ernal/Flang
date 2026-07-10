@@ -43,6 +43,31 @@ open Flang/Flang.xcodeproj
 
 Build and run with Cmd+R (Xcode 16 or newer, macOS 13 Ventura or newer).
 
+Once released, Flang will ship as a DMG on
+[GitHub Releases](https://github.com/e1ernal/Flang/releases) — download it and
+drag Flang.app into Applications, then see below before opening it.
+
+### Opening an unsigned app
+
+Flang isn't notarized by Apple. Notarization needs a paid Apple Developer
+Program membership, which this project doesn't have yet — that is planned for
+after 1.0 proves there's an audience worth paying for (see the
+[roadmap](#roadmap)). Until then, macOS Gatekeeper blocks a plain
+double-click with "Flang can't be opened because Apple cannot check it for
+malicious software."
+
+This is expected, not a bug or a sign anything is wrong. To open it the first
+time:
+
+1. Right-click (or Control-click) Flang.app in Applications and choose **Open**.
+2. Click **Open** again in the dialog that appears.
+
+<!-- TODO(docs/images/gatekeeper-open.png): screenshot of the right-click
+"Open" context menu on Flang.app, or the resulting Gatekeeper dialog -->
+
+You only need to do this once — every launch after that, including future
+updates, opens normally.
+
 ## Usage
 
 1. Launch Flang — a flag appears in your menu bar.
