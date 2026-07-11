@@ -2,7 +2,7 @@
 
 **Recupera las banderas de los países en el selector de fuentes de entrada de macOS.**
 
-[English](../../README.md) | Español | [Français](README.fr.md) | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | [日本語](README.ja.md)
+[English](../../README.md) | Español | [Français](README.fr.md) | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | [日本語](README.ja.md) | [Русский](README.ru.md)
 
 Hasta macOS 12.4, el selector de distribución de teclado en la barra de menús
 mostraba la bandera de un país. Apple sustituyó después las banderas por
@@ -105,7 +105,7 @@ versiones en GitHub. Nada sobre ti o tu sistema se envía jamás a ningún sitio
 - [x] Comprobación de actualizaciones contra GitHub Releases
 - [x] Interfaz localizada en EN y RU
 - [x] Compilaciones DMG distribuibles vía GitHub Releases
-- [x] README localizado (ES, FR, JA, PT-BR, ZH-Hans)
+- [x] README localizado (ES, FR, JA, PT-BR, ZH-Hans, RU)
 - [ ] Compilaciones firmadas y actualizaciones automáticas
 
 ## Contribuir

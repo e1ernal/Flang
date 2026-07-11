@@ -2,7 +2,7 @@
 
 **让国旗重新回到 macOS 输入源切换器。**
 
-[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | [Português](README.pt-BR.md) | 中文 | [日本語](README.ja.md)
+[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | [Português](README.pt-BR.md) | 中文 | [日本語](README.ja.md) | [Русский](README.ru.md)
 
 在 macOS 12.4 之前，菜单栏中的键盘布局切换器会显示一个国家的国旗。之后 Apple
 用纯文本标签（"ABC"、"ES"）取代了国旗。Flang 是一个小巧的菜单栏应用，把国旗带
@@ -92,7 +92,7 @@ Flang 尚未经过 Apple 公证。公证需要付费的 Apple Developer Program 
 - [x] 通过 GitHub Releases 检查更新
 - [x] 界面支持英语和俄语本地化
 - [x] 通过 GitHub Releases 分发的 DMG 构建
-- [x] 本地化的 README（ES、FR、JA、PT-BR、ZH-Hans）
+- [x] 本地化的 README（ES、FR、JA、PT-BR、ZH-Hans、RU）
 - [ ] 签名构建与自动更新
 
 ## 贡献
