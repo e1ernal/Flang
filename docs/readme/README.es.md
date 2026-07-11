@@ -30,9 +30,9 @@ francés, o la mexicana para el español? Dos clics.
 
 ## Instalación
 
-Descarga el último DMG desde
-[GitHub Releases](https://github.com/e1ernal/Flang/releases), ábrelo y
-arrastra Flang.app a Aplicaciones — luego lee lo siguiente antes de abrirlo.
+Descarga el último zip desde
+[GitHub Releases](https://github.com/e1ernal/Flang/releases), descomprímelo y
+mueve Flang.app a Aplicaciones — luego lee lo siguiente antes de abrirlo.
 
 Para compilar desde el código fuente en su lugar:
 
@@ -104,7 +104,7 @@ versiones en GitHub. Nada sobre ti o tu sistema se envía jamás a ningún sitio
 - [x] Inicio con el login, consejos en el primer arranque
 - [x] Comprobación de actualizaciones contra GitHub Releases
 - [x] Interfaz localizada en EN y RU
-- [x] Compilaciones DMG distribuibles vía GitHub Releases
+- [x] Compilaciones zip distribuibles vía GitHub Releases
 - [x] README localizado (ES, FR, JA, PT-BR, ZH-Hans, RU)
 - [ ] Compilaciones firmadas y actualizaciones automáticas
 

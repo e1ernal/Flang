@@ -29,9 +29,9 @@ Spanish? Two clicks.
 
 ## Installation
 
-Download the latest DMG from
-[GitHub Releases](https://github.com/e1ernal/Flang/releases), open it, and
-drag Flang.app into Applications — then see below before opening it.
+Download the latest zip from
+[GitHub Releases](https://github.com/e1ernal/Flang/releases), unzip it, and
+move Flang.app into Applications — then see below before opening it.
 
 To build from source instead:
 
@@ -101,7 +101,7 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Start at login, first-launch tips
 - [x] Update check against GitHub Releases
 - [x] Interface localized in EN and RU
-- [x] Distributable DMG builds via GitHub Releases
+- [x] Distributable zip builds via GitHub Releases
 - [x] Localized README (ES, FR, JA, PT-BR, ZH-Hans, RU)
 - [ ] Signed builds and automatic updates
 

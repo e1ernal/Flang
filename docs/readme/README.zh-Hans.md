@@ -28,7 +28,7 @@
 ## 安装
 
 从 [GitHub Releases](https://github.com/e1ernal/Flang/releases) 下载最新的
-DMG，打开它，把 Flang.app 拖入"应用程序"——在打开它之前请先阅读下文。
+zip 压缩包，解压后把 Flang.app 移动到"应用程序"——在打开它之前请先阅读下文。
 
 若想改为从源码构建：
 
@@ -91,7 +91,7 @@ Flang 尚未经过 Apple 公证。公证需要付费的 Apple Developer Program 
 - [x] 登录时启动，首次启动提示
 - [x] 通过 GitHub Releases 检查更新
 - [x] 界面支持英语和俄语本地化
-- [x] 通过 GitHub Releases 分发的 DMG 构建
+- [x] 通过 GitHub Releases 分发的 zip 构建
 - [x] 本地化的 README（ES、FR、JA、PT-BR、ZH-Hans、RU）
 - [ ] 签名构建与自动更新
 

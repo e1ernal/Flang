@@ -4,6 +4,14 @@ All notable changes to Flang are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [semver](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Distribute as a plain zip of Flang.app instead of a DMG. A DMG's own Finder
+  icon doesn't survive a plain download from GitHub Releases, while an app
+  bundle's icon is ordinary file content that comes through a zip fine.
+
 ## [1.0.0] — 2026-07-10
 
 First public release.
