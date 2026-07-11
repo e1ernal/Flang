@@ -70,11 +70,11 @@ symlinks = {"Applications": "/Applications"}
 icon = "$VOLUME_ICON"
 
 icon_locations = {
-    appname: (140, 170),
-    "Applications": (400, 170),
+    appname: (150, 220),
+    "Applications": (410, 220),
 }
 
-window_rect = ((200, 200), (540, 380))
+window_rect = ((200, 150), (560, 480))
 icon_size = 128
 text_size = 14
 background = "$BACKGROUND"

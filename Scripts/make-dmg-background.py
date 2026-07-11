@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Generate the DMG window background (Scripts/dmg-assets/), matching
-Flang's design system (Flang/UI/DesignSystem.swift, dark "hero" palette —
-same one FirstLaunchWindow.swift uses) rather than dmgbuild's generic
-built-in arrow.
+"""Generate the DMG window background (Scripts/dmg-assets/) — a light
+background (matching FlangColor's light windowBackground) so Finder's own
+black icon-name labels stay readable, with the install instruction in the
+system font instead of dmgbuild's generic built-in arrow.
 
 Regenerate after changing the DMG layout in make-dmg.sh (icon_locations,
 window_rect) — the arrow position here is derived from those same numbers
@@ -19,20 +19,19 @@ from PIL import Image, ImageDraw, ImageFont
 
 OUT_DIR = Path(__file__).parent / "dmg-assets"
 
-# Colors — DesignSystem.swift FlangColor, dark theme (hero* roles).
-BG = (40, 40, 40)  # heroCardBackground dark: rgb(0.157,0.157,0.157)
-TITLE = (235, 235, 235)  # heroTitleText dark: white 0.92
-SUBTITLE = (150, 150, 150)  # heroSubtitleText dark: white 0.5
-ACCENT = (10, 132, 255)  # accent dark: 0.039/0.518/1.0
-CAPTION = (110, 110, 110)  # heroCaptionText dark: white 0.3
+# Colors — DesignSystem.swift FlangColor, light theme.
+BG = (245, 243, 240)  # windowBackground light: rgb(0.961,0.953,0.941)
+SUBTITLE = (100, 100, 100)
+ACCENT = (10, 132, 255)  # accent dark: 0.039/0.518/1.0 — reads fine on light too
+CAPTION = (140, 140, 140)
 
 FONT_PATH = "/System/Library/Fonts/SFNS.ttf"
 
 # Must match icon_locations / window_rect in make-dmg.sh.
-WINDOW_SIZE = (540, 380)
+WINDOW_SIZE = (560, 480)
 ICON_SIZE = 128
-FLANG_ICON_CENTER = (140, 170)
-APPLICATIONS_ICON_CENTER = (400, 170)
+FLANG_ICON_CENTER = (150, 220)
+APPLICATIONS_ICON_CENTER = (410, 220)
 
 
 def render(scale: int, out_path: Path) -> None:
@@ -54,8 +53,7 @@ def render(scale: int, out_path: Path) -> None:
         text_w = bbox[2] - bbox[0]
         draw.text(((w - text_w) / 2, y * scale), text, font=fnt, fill=color)
 
-    center_text("Flang", 28, font(30, weight=700), TITLE)
-    center_text("Drag to Applications to install", 68, font(13), SUBTITLE)
+    center_text("Drag to Applications to install", 64, font(13), SUBTITLE)
 
     # icon_locations give each icon's CENTER point, not top-left.
     icon_half = ICON_SIZE / 2
@@ -77,7 +75,7 @@ def render(scale: int, out_path: Path) -> None:
         fill=ACCENT,
     )
 
-    center_text("flang · flags for your keyboard", 348, font(11), CAPTION)
+    center_text("flang · flags for your keyboard", 420, font(11), CAPTION)
 
     img.save(out_path)
     print(f"wrote {out_path} ({w}x{h})")
