@@ -2,9 +2,7 @@
 
 **Bring country flags back to the macOS input source switcher.**
 
-<!-- Language switcher — uncomment as translations appear in docs/readme/
-English | [Español](docs/readme/README.es.md) | [Français](docs/readme/README.fr.md) | [Português](docs/readme/README.pt-BR.md) | [中文](docs/readme/README.zh-Hans.md) | [日本語](docs/readme/README.ja.md) | [Русский](docs/readme/README.ru.md)
--->
+English | [Español](docs/readme/README.es.md) | [Français](docs/readme/README.fr.md) | [Português](docs/readme/README.pt-BR.md) | [中文](docs/readme/README.zh-Hans.md) | [日本語](docs/readme/README.ja.md)
 
 Until macOS 12.4, the keyboard layout switcher in the menu bar showed a country
 flag. Apple then replaced the flags with plain text labels ("ABC", "ES").
@@ -103,8 +101,8 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Start at login, first-launch tips
 - [x] Update check against GitHub Releases
 - [x] Interface localized in EN and RU
-- [x] DMG releases with built-in update notifications
-- [ ] Localized README (ES, FR, JA, PT-BR, ZH-Hans)
+- [x] Distributable DMG builds via GitHub Releases
+- [x] Localized README (ES, FR, JA, PT-BR, ZH-Hans)
 - [ ] Signed builds and automatic updates
 
 ## Contributing

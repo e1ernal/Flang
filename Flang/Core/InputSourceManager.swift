@@ -21,21 +21,17 @@ struct InputSource {
     let id: String
     /// Localized display name, e.g. "ABC" or "Spanish".
     let name: String
-    /// Whether this source is the currently active one.
     let isSelected: Bool
-    /// Input languages, most representative first (`kTISPropertyInputSourceLanguages`).
-    /// Used by `FlagStore` for the language -> country fallback (FR-6, step 3).
+    /// Most representative language first; used by `FlagStore`'s country fallback.
     let languages: [String]
-    /// URL of the source's own system icon, loaded lazily by `FlagStore` only when
-    /// the fallback icon is actually needed (FR-3). Storing the URL (not the image)
-    /// keeps building sources cheap on the hot switch/rebuild path.
+    /// URL of the source's system icon. Kept as a URL, not an image, so
+    /// building sources stays cheap — `FlagStore` loads it lazily if needed.
     let systemIconURL: URL?
 
-    /// Short abbreviation for the compact indicator styles (FR-4). macOS has no
-    /// public API for the exact menu-bar abbreviation, so we approximate: a name
-    /// that is already short (e.g. "ABC") is used as-is; otherwise the primary
-    /// language subtag uppercased (e.g. "Spanish" -> "ES", "zh-Hant" -> "ZH");
-    /// failing that, a short prefix of the name. Users can override it in Phase 4.
+    /// macOS has no public API for the menu-bar abbreviation, so this
+    /// approximates one: short names pass through as-is, otherwise the
+    /// primary language subtag uppercased ("Spanish" -> "ES"), falling back
+    /// to a prefix of the name. Users can override it per-source.
     var shortName: String {
         if name.count <= 4 {
             return name
@@ -48,19 +44,15 @@ struct InputSource {
     }
 }
 
-/// Delegate notified when the active source or the set of enabled sources changes.
-/// `AnyObject` + `weak` reference below break the retain cycle with the owner.
+/// Notified when the active source or the set of enabled sources changes.
 protocol InputSourceMonitoring: AnyObject {
-    /// The active input source changed (hotkey, menu, automatic switch, or Flang itself).
     func selectedInputSourceDidChange()
-    /// The list of enabled input sources changed (added/removed in System Settings).
     func enabledInputSourcesDidChange()
 }
 
-/// The only place in the app that talks to the Carbon Text Input Sources (TIS) API.
-/// `ObservableObject` so SwiftUI views (the Settings window) can refresh their
-/// source list live, alongside the `InputSourceMonitoring` delegate used by the
-/// AppKit menu.
+/// The only place in the app that talks to the Carbon Text Input Sources (TIS)
+/// API. `ObservableObject` so the SwiftUI Settings window can refresh its
+/// source list live, alongside the AppKit menu's `InputSourceMonitoring` delegate.
 final class InputSourceManager: ObservableObject {
     weak var delegate: InputSourceMonitoring?
 
@@ -99,21 +91,18 @@ final class InputSourceManager: ObservableObject {
                     && $0.isSelectable
                     && $0.isEnabled
             }
-            // The bulk (nil-filter) list can keep listing a source for a while
-            // after it's fully removed in System Settings — outright deletion
-            // doesn't reliably invalidate it the way toggling one off does.
-            // Cross-check each candidate with a filtered, single-ID query (the
-            // same safe pattern already used by `installedSource(id:)`), which
-            // reflects the deletion promptly.
+            // The bulk list can keep listing a source for a while after it's
+            // deleted in System Settings, so cross-check each one with a
+            // filtered single-ID query, which reflects deletions promptly.
             .filter { source in
                 guard let id = source.id else { return false }
                 return isActuallyEnabled(id: id)
             }
             .compactMap { makeInputSource(from: $0, currentID: currentID) }
 
-        // Collapse sources that share a localized name (e.g. two Japanese input
-        // methods both shown as "Hiragana") into one entry, in system order. Prefer
-        // the selected variant so the active source keeps its checkmark.
+        // Collapse sources that share a localized name (e.g. two Japanese
+        // input methods both shown as "Hiragana"), preferring the selected
+        // variant so the active source keeps its checkmark.
         var order: [String] = []
         var byName: [String: InputSource] = [:]
         for source in all {
@@ -141,13 +130,18 @@ final class InputSourceManager: ObservableObject {
         }
     }
 
-    /// Whether an installed (not necessarily enabled) source exists. Uses a filtered
-    /// `TISCreateInputSourceList` with a specific ID — unlike the unfiltered
-    /// `(nil, true)` call this does NOT re-enable all installed sources. Used to
-    /// detect Keyboard Viewer on macOS versions where it exists as a palette source
-    /// but is not in the enabled list (SPEC FR-2 note).
+    /// Whether an installed (not necessarily enabled) source exists — used to
+    /// detect Keyboard Viewer on macOS versions where it's a palette source
+    /// that isn't in the enabled list.
     func isSourceAvailable(id: String) -> Bool {
         installedSource(id: id) != nil
+    }
+
+    /// Opens System Settings → Keyboard → Input Sources, where macOS handles
+    /// adding and removing input sources directly.
+    static func openSystemKeyboardSettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     /// Activate an enabled source by id — used for the Keyboard Viewer palette source.
@@ -159,10 +153,9 @@ final class InputSourceManager: ObservableObject {
         }
     }
 
-    /// Look up a source among the *enabled* ones. We must not use
-    /// `TISCreateInputSourceList(nil, true)` (all installed): that call has a nasty
-    /// side effect of re-enabling every installed source, which made removed
-    /// layouts reappear in the menu.
+    /// Look up a source among the enabled ones. Deliberately not the unfiltered
+    /// `(nil, true)` query — that re-enables every installed source as a side
+    /// effect, which made removed layouts reappear in the menu.
     private func enabledSource(id: String) -> TISInputSource? {
         guard let list = TISCreateInputSourceList(nil, false)?.takeRetainedValue() as? [TISInputSource] else {
             return nil
@@ -170,9 +163,9 @@ final class InputSourceManager: ObservableObject {
         return list.first { $0.id == id }
     }
 
-    /// Look up a source among ALL installed sources (including non-enabled) using a
-    /// filtered query. Passing a filter dict with a specific ID avoids the side effect
-    /// of `TISCreateInputSourceList(nil, true)` which re-enables all installed sources.
+    /// Look up a source among all installed sources, including disabled ones.
+    /// Filtering by a specific ID avoids the mass re-enable side effect an
+    /// unfiltered `(nil, true)` query would have.
     private func installedSource(id: String) -> TISInputSource? {
         let filter = [kTISPropertyInputSourceID: id] as CFDictionary
         guard let list = TISCreateInputSourceList(filter, true)?.takeRetainedValue() as? [TISInputSource] else {
@@ -181,17 +174,13 @@ final class InputSourceManager: ObservableObject {
         return list.first
     }
 
-    /// Fresh, single-ID re-check of whether a source the bulk list just returned
-    /// is genuinely still enabled. Filtered queries (unlike the bulk `nil`-filter
-    /// one `inputSources` starts from) seem to reflect a just-deleted source
-    /// promptly instead of holding onto a stale snapshot — same safe pattern as
-    /// `installedSource(id:)`, so it carries no reactivation side effect.
+    /// Filtered single-ID re-check of a source the bulk list just returned.
+    /// Unlike that bulk query, this reflects a just-deleted source promptly.
     private func isActuallyEnabled(id: String) -> Bool {
         installedSource(id: id)?.isEnabled ?? false
     }
 
-    /// The system icon of an enabled or installed source (e.g. the Keyboard Viewer
-    /// palette), used to give parity menu items their icon (FR-2).
+    /// The system icon of an enabled or installed source, for parity menu items.
     func icon(forSourceID id: String) -> NSImage? {
         guard let source = enabledSource(id: id) ?? installedSource(id: id),
               let url = source.iconImageURL else { return nil }
@@ -210,14 +199,9 @@ final class InputSourceManager: ObservableObject {
         )
     }
 
-    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` can arrive slightly before
-    /// TIS's own enabled-sources list actually reflects an add/remove made in
-    /// System Settings — `TISCreateInputSourceList` briefly keeps returning the
-    /// old set. Re-check shortly after the first notification so a just-deleted
-    /// source doesn't linger in the menu/Settings list until something else
-    /// happens to trigger a re-query. Deleting a source outright (as opposed to
-    /// just disabling one) seems to settle slower than the enable/disable case
-    /// this was first written for, hence the second, later retry.
+    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` can arrive slightly
+    /// before TIS's own list catches up, so retry shortly after — deletions
+    /// seem to settle slower than a plain enable/disable, hence two retries.
     private func notifyEnabledSourcesChanged() {
         delegate?.enabledInputSourcesDidChange()
         objectWillChange.send()
@@ -230,12 +214,9 @@ final class InputSourceManager: ObservableObject {
         }
     }
 
-    /// TIS notifications aren't reliably posted for every kind of System
-    /// Settings change — deleting a source outright doesn't seem to trigger
-    /// `kTISNotifyEnabledKeyboardInputSourcesChanged` the way disabling one
-    /// does. Refresh whenever Flang regains focus too, since the common flow
-    /// is "make the change in System Settings, switch back to Flang" — a
-    /// signal that doesn't depend on TIS posting anything at all.
+    /// Deleting a source outright doesn't reliably trigger the TIS
+    /// notification the way disabling one does, so also refresh whenever
+    /// Flang regains focus — the common flow after a System Settings change.
     private func registerForActivationRefresh() {
         NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification,
