@@ -70,18 +70,11 @@ struct IndicatorTab: View {
                     .font(FlangFont.label)
                     .foregroundStyle(theme.primaryText)
                 Spacer()
-                HStack(spacing: 7) {
+                FlangDropdownChip(theme: theme) {
                     Text(value)
                         .font(FlangFont.label)
                         .foregroundStyle(theme.chipText)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(theme.chipChevron)
-                        .accessibilityHidden(true)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
             }
             .padding(FlangSpacing.cardPadding)
             .contentShape(Rectangle())
@@ -128,11 +121,12 @@ struct IndicatorTab: View {
                     .foregroundStyle(theme.primaryText)
             }
             if flagImage(for: source) == nil && name == nil {
-                if let source, let icon = flagStore.systemIcon(for: source, height: 16, dark: theme.isDark) {
+                if let source,
+                   let icon = flagStore.systemIcon(for: source, height: FlagRenderer.menuHeight, dark: theme.isDark) {
                     Image(nsImage: icon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 16)
+                        .frame(height: FlagRenderer.menuHeight)
                         .accessibilityLabel(Text(source.name))
                 } else if let source {
                     Text(source.shortName)
@@ -146,8 +140,8 @@ struct IndicatorTab: View {
     private func flagImage(for source: InputSource?) -> NSImage? {
         guard let source else { return nil }
         switch settings.flagSetting {
-        case .image: return flagStore.image(for: source, mode: .images, height: 16)
-        case .emoji: return flagStore.image(for: source, mode: .emoji, height: 16)
+        case .image: return flagStore.image(for: source, mode: .images, height: FlagRenderer.menuHeight)
+        case .emoji: return flagStore.image(for: source, mode: .emoji, height: FlagRenderer.menuHeight)
         case .none: return nil
         }
     }
@@ -191,7 +185,7 @@ struct IndicatorTab: View {
     private var flagPicker: some View {
         VStack(spacing: 0) {
             ForEach(Array(SettingsStore.FlagSetting.allCases.enumerated()), id: \.element.id) { index, option in
-                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, 16) }
+                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, FlangSpacing.cardPadding) }
                 pickerRow(option.title, selected: settings.flagSetting == option) {
                     settings.flagSetting = option
                 }
@@ -203,7 +197,7 @@ struct IndicatorTab: View {
     private var namePicker: some View {
         VStack(spacing: 0) {
             ForEach(Array(SettingsStore.NameSetting.allCases.enumerated()), id: \.element.id) { index, option in
-                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, 16) }
+                if index > 0 { FlangSeparator(theme: theme).padding(.horizontal, FlangSpacing.cardPadding) }
                 pickerRow(option.title, selected: settings.nameSetting == option) {
                     settings.nameSetting = option
                 }

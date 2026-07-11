@@ -188,10 +188,8 @@ struct AboutTab: View {
         NSWorkspace.shared.open(url)
     }
 
-    /// New GitHub Issue pre-filled with app + macOS version (FR-15) — shown to the
-    /// user in the browser before submitting, so they can edit or delete it. Targets
-    /// the Bug report issue form (.github/ISSUE_TEMPLATE/bug_report.yml) and fills
-    /// its "app-version"/"macos-version" fields by their query-param IDs.
+    /// Opens the Bug report issue form pre-filled with app + macOS version —
+    /// shown in the browser before submitting, so the user can still edit it.
     private var reportBugURL: String {
         var components = URLComponents(string: "https://github.com/e1ernal/Flang/issues/new")
         components?.queryItems = [

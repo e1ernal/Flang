@@ -171,10 +171,10 @@ struct InputSourcesTab: View {
         } label: {
             HStack(spacing: 10) {
                 let mode: FlagStore.Mode = settings.flagSetting == .emoji ? .emoji : .images
-                Image(nsImage: flagStore.image(for: source, mode: mode, height: 16))
+                Image(nsImage: flagStore.image(for: source, mode: mode, height: FlagRenderer.menuHeight))
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 24, height: 16)
+                    .frame(width: 24, height: FlagRenderer.menuHeight)
                     .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
                     .accessibilityHidden(true)
 
@@ -209,8 +209,7 @@ struct InputSourcesTab: View {
     }
 
     func openKeyboardSettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
-        NSWorkspace.shared.open(url)
+        InputSourceManager.openSystemKeyboardSettings()
     }
 }
 
@@ -257,7 +256,7 @@ extension InputSourcesTab {
                     .font(FlangFont.sectionSubtitle)
                     .foregroundStyle(theme.secondaryText)
                 Spacer()
-                HStack(spacing: 7) {
+                FlangDropdownChip(theme: theme, compact: true) {
                     if let effectiveCode, let image = flagStore.image(forCode: effectiveCode, mode: mode, height: 12) {
                         Image(nsImage: image)
                             .resizable()
@@ -266,14 +265,7 @@ extension InputSourcesTab {
                             .clipShape(RoundedRectangle(cornerRadius: FlangRadius.flagImage))
                             .accessibilityHidden(true)
                     }
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.system(size: 8, weight: .semibold))
-                        .foregroundStyle(theme.chipChevron)
-                        .accessibilityHidden(true)
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(theme.chipBackground, in: RoundedRectangle(cornerRadius: FlangRadius.chip))
             }
             .padding(.vertical, FlangSpacing.nestedPadding)
             .contentShape(Rectangle())

@@ -17,10 +17,8 @@ struct GeneralTab: View {
     @Environment(\.colorScheme) private var scheme
     private var theme: FlangColor { FlangColor(scheme) }
 
-    /// Only languages with an actual translation ship in the picker (FR-12, v1.0:
-    /// EN + RU — see `_local/SPEC.md` roadmap). The full 7-language set from the
-    /// design mockup lands in 1.1 once translated; listing untranslated languages
-    /// now would silently fall back to English with no explanation.
+    /// Only languages with an actual translation — the rest of the mockup's
+    /// 7-language set ships once translated, in a later release.
     private let languages: [(code: String, name: String)] = [
         ("system", String(localized: "System Default")),
         ("en", Locale.current.localizedString(forLanguageCode: "en") ?? "English"),
@@ -147,7 +145,7 @@ struct GeneralTab: View {
             VStack(spacing: 0) {
                 ForEach(Array(languages.enumerated()), id: \.element.code) { index, lang in
                     if index > 0 {
-                        FlangSeparator(theme: theme).padding(.horizontal, 16)
+                        FlangSeparator(theme: theme).padding(.horizontal, FlangSpacing.cardPadding)
                     }
                     let isSelected = lang.code == settings.interfaceLanguage
                     Button {
@@ -203,10 +201,9 @@ struct GeneralTab: View {
     private func relaunch() {
         let url = Bundle.main.bundleURL
         let configuration = NSWorkspace.OpenConfiguration()
-        // Without this, openApplication just activates the already-running
-        // instance (us) instead of spawning a new one — terminating right after
-        // then raced LaunchServices trying to activate a process mid-quit,
-        // surfacing "The application is not open anymore".
+        // Without this, openApplication just re-activates us instead of
+        // spawning a new instance, and terminating right after races
+        // LaunchServices into showing "The application is not open anymore".
         configuration.createsNewApplicationInstance = true
         NSWorkspace.shared.openApplication(at: url, configuration: configuration) { app, error in
             guard app != nil, error == nil else { return }

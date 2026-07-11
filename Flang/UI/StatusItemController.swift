@@ -31,11 +31,8 @@ final class StatusItemController: NSObject {
         max(FlagRenderer.menuHeight, NSStatusBar.system.thickness - 4)
     }
 
-    /// Whether the menu bar is currently rendering in a dark appearance — used to
-    /// pick a contrasting badge color for the "System" indicator style (FR-3).
-    /// Read from the status item's own button rather than `NSApp.effectiveAppearance`,
-    /// since the menu bar can differ from the app's own appearance ("Auto" menu
-    /// bar tinting tied to the desktop picture).
+    /// Read from the status item's own button, not `NSApp.effectiveAppearance` —
+    /// the menu bar can tint itself independently of the app's own appearance.
     private var isMenuBarDark: Bool {
         let appearance = statusItem.button?.effectiveAppearance ?? NSApp.effectiveAppearance
         return appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
@@ -102,8 +99,7 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func openKeyboardSettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
-        NSWorkspace.shared.open(url)
+        InputSourceManager.openSystemKeyboardSettings()
     }
 
     @objc private func quitClicked() {

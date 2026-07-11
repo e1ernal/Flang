@@ -103,7 +103,7 @@ Nothing about you or your system is ever sent anywhere.
 - [x] Start at login, first-launch tips
 - [x] Update check against GitHub Releases
 - [x] Interface localized in EN and RU
-- [x] DMG releases with built-in update notifications
+- [x] Distributable DMG builds via GitHub Releases
 - [ ] Localized README (ES, FR, JA, PT-BR, ZH-Hans)
 - [ ] Signed builds and automatic updates
 
