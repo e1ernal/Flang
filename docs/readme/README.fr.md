@@ -2,7 +2,7 @@
 
 **Ramène les drapeaux des pays dans le sélecteur de source de saisie de macOS.**
 
-[English](../../README.md) | [Español](README.es.md) | Français | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | [日本語](README.ja.md)
+[English](../../README.md) | [Español](README.es.md) | Français | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | [日本語](README.ja.md) | [Русский](README.ru.md)
 
 Jusqu'à macOS 12.4, le sélecteur de disposition de clavier dans la barre de
 menus affichait le drapeau d'un pays. Apple a ensuite remplacé les drapeaux
@@ -107,7 +107,7 @@ jamais envoyé où que ce soit.
 - [x] Vérification des mises à jour via GitHub Releases
 - [x] Interface localisée en EN et RU
 - [x] Compilations DMG distribuables via GitHub Releases
-- [x] README localisé (ES, FR, JA, PT-BR, ZH-Hans)
+- [x] README localisé (ES, FR, JA, PT-BR, ZH-Hans, RU)
 - [ ] Compilations signées et mises à jour automatiques
 
 ## Contribuer

@@ -2,7 +2,7 @@
 
 **macOSの入力ソース切り替えメニューに、国旗を取り戻す。**
 
-[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | 日本語
+[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | [Português](README.pt-BR.md) | [中文](README.zh-Hans.md) | 日本語 | [Русский](README.ru.md)
 
 macOS 12.4までは、メニューバーのキーボードレイアウト切り替えメニューに国旗が
 表示されていました。その後Appleは国旗を「ABC」「ES」のようなテキストラベルに
@@ -106,7 +106,7 @@ Developer Programへの加入が必要ですが、このプロジェクトはま
 - [x] GitHub Releasesを使った更新確認
 - [x] インターフェースの英語・ロシア語対応
 - [x] GitHub Releases経由で配布可能なDMGビルド
-- [x] README のローカライズ（ES、FR、JA、PT-BR、ZH-Hans）
+- [x] README のローカライズ（ES、FR、JA、PT-BR、ZH-Hans、RU）
 - [ ] 署名済みビルドと自動アップデート
 
 ## コントリビューション

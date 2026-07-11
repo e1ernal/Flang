@@ -2,7 +2,7 @@
 
 **Traga de volta as bandeiras dos países no seletor de fontes de entrada do macOS.**
 
-[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | Português | [中文](README.zh-Hans.md) | [日本語](README.ja.md)
+[English](../../README.md) | [Español](README.es.md) | [Français](README.fr.md) | Português | [中文](README.zh-Hans.md) | [日本語](README.ja.md) | [Русский](README.ru.md)
 
 Até o macOS 12.4, o seletor de layout de teclado na barra de menus mostrava a
 bandeira de um país. A Apple então substituiu as bandeiras por rótulos de
@@ -105,7 +105,7 @@ versões no GitHub. Nada sobre você ou seu sistema é enviado a lugar nenhum.
 - [x] Verificação de atualizações via GitHub Releases
 - [x] Interface localizada em EN e RU
 - [x] Builds DMG distribuíveis via GitHub Releases
-- [x] README localizado (ES, FR, JA, PT-BR, ZH-Hans)
+- [x] README localizado (ES, FR, JA, PT-BR, ZH-Hans, RU)
 - [ ] Builds assinados e atualizações automáticas
 
 ## Contribuindo
