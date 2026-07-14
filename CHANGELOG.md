@@ -12,6 +12,11 @@ All notable changes to Flang are documented here. Format follows
   icon doesn't survive a plain download from GitHub Releases, while an app
   bundle's icon is ordinary file content that comes through a zip fine.
 
+### Fixed
+
+- Two menu bar icons appearing after a reboot — the Login Items entry and
+  macOS's own window-reopen-at-login feature could both relaunch the app.
+
 ## [1.0.0] — 2026-07-10
 
 First public release.
